@@ -2,10 +2,15 @@
     <string name="app_name">Car Rent</string>
     <string name="login_here">Login Here!</string>
     <string name="login">Login</string>
-    <string name="register_here">Register Here</string>
+    <string name="register">Register</string>
+    <string name="register_here">Register Here!</string>
+    <string name="already_registered">I have an account!</string>
     <string name="forgot_password">Forgot password</string>
 
     <!--EditText Hints-->
+    <string name="hint_username">Enter username</string>
     <string name="hint_email">Enter email</string>
     <string name="hint_password">Enter password</string>
+    <string name="hint_confirm_password">Confirm password</string>
+    <string name="hint_phone_number">Enter phone number</string>
 </resources>

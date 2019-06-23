@@ -11,6 +11,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:scrollbarStyle="outsideOverlay">
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,9 +37,17 @@
                     style="@style/TextPrimaryBold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/login_here"
+                    android:text="@string/register_here"
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="20dp"/>
+
+            <EditText
+                    android:id="@+id/et_username"
+                    style="@style/EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_username"
+                    android:inputType="textPersonName"/>
 
             <EditText
                     android:id="@+id/et_email"
@@ -48,50 +57,59 @@
                     android:hint="@string/hint_email"
                     android:inputType="textEmailAddress"/>
 
-            <EditText
-                    android:id="@+id/et_password"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_password"
-                    android:inputType="textPassword"/>
-
-            <Button
-                    android:id="@+id/btn_login"
-                    style="@style/button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login"/>
-
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="15dp"
                     android:weightSum="2">
 
-                <TextView
-                        android:id="@+id/tv_register_here"
-                        style="@style/TextSecondaryItalic"
-                        android:layout_width="wrap_content"
+                <EditText
+                        android:id="@+id/et_password"
+                        style="@style/EditText"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="@string/register_here"/>
+                        android:hint="@string/hint_password"
+                        android:inputType="textPassword"/>
 
-                <TextView
-                        android:id="@+id/tv_forgot_password"
-                        style="@style/TextSecondaryItalic"
-                        android:layout_width="wrap_content"
+                <EditText
+                        android:id="@+id/et_password_confirm"
+                        style="@style/EditText"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="@string/forgot_password"/>
-
+                        android:hint="@string/hint_confirm_password"
+                        android:inputType="textPassword"/>
             </LinearLayout>
+
+            <EditText
+                    android:id="@+id/et_phone"
+                    style="@style/EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_phone_number"
+                    android:inputType="phone"/>
+
+            <Button
+                    android:id="@+id/btn_register"
+                    style="@style/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register"/>
+
+            <TextView
+                    android:id="@+id/tv_register_here"
+                    style="@style/TextSecondaryItalic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="15dp"
+                    android:gravity="center"
+                    android:text="@string/already_registered"/>
 
         </LinearLayout>
 
     </LinearLayout>
+
+
 </ScrollView>
