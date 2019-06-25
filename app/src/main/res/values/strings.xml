@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Car Rent</string>
-    <string name="login_here">Login Here!</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
-    <string name="register_here">Register Here!</string>
-    <string name="already_registered">I have an account!</string>
+    <string name="already_registered">I have an account</string>
+    <string name="not_registered">I don`t have an account</string>
     <string name="forgot_password">Forgot password</string>
+    <string name="enter_valid_email">Enter valid email</string>
+    <string name="passwords_no_match">Passwords didn`t match</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>

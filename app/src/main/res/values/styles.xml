@@ -17,7 +17,7 @@
 
     <style name="TextSecondaryItalic">
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">monospace</item>
         <item name="android:textStyle">italic</item>
     </style>
@@ -39,7 +39,22 @@
         <item name="android:background">@drawable/custom_button_primary</item>
         <item name="android:layout_marginLeft">35dp</item>
         <item name="android:layout_marginRight">35dp</item>
-        <item name="android:layout_marginTop">15dp</item>
+    </style>
+
+    <style name="progress_bar">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+
+    <style name="iv_logo">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:src">@drawable/ic_directions_car_primary_100dp</item>
     </style>
 
 </resources>
