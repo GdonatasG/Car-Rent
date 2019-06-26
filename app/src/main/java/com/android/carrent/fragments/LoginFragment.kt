@@ -1,45 +1,54 @@
-package com.android.carrent.activities
+package com.android.carrent.fragments
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+
 import com.android.carrent.R
-import com.android.carrent.utils.hideProgressBar
-import com.android.carrent.utils.makeToast
-import kotlinx.android.synthetic.main.activity_login.*
-import com.android.carrent.utils.setLogoAndFormFadeIn
-import com.android.carrent.utils.showProgressBar
+import com.android.carrent.utils.*
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.fragment_login.*
+import kotlinx.android.synthetic.main.fragment_login.view.*
 
-
-class LoginActivity : AppCompatActivity(), View.OnClickListener {
+class LoginFragment : Fragment(), View.OnClickListener {
     private var disabledWhileLogin = false
-    private var TAG: String = "LoginActivity"
+    private var TAG: String = "LoginFragment"
     private var mAuth: FirebaseAuth? = null
+    private lateinit var splashFragment: SplashFragment
+    private lateinit var registerFragment: RegisterFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-
         mAuth = FirebaseAuth.getInstance()
+        splashFragment = SplashFragment()
+        registerFragment = RegisterFragment()
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        var v: View = inflater.inflate(R.layout.fragment_login, container, false)
         mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting SplashActivity")
-            finish()
-            startSplashActivity()
+            Log.d(TAG, "User is already logged in, starting SplashFragment")
+            changeFragment(splashFragment)
         }
 
-        setLogoAndFormFadeIn(applicationContext, iv_logo, login_form)
+        setLogoAndFormFadeIn(context!!, v.iv_logo, v.login_form)
 
-        btn_login.setOnClickListener(this)
+        v.btn_login.setOnClickListener(this)
 
-        tv_goto_register.setOnClickListener(this)
+        v.tv_goto_register.setOnClickListener(this)
 
-        tv_forgot_password.setOnClickListener(this)
+        v.tv_forgot_password.setOnClickListener(this)
 
+        return v
     }
 
     override fun onClick(v: View?) {
@@ -52,7 +61,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             R.id.tv_goto_register -> {
                 Log.d(TAG, "Clicked on register textview")
                 if (!disabledWhileLogin) {
-                    startRegisterActivity()
+                    changeFragment(registerFragment)
                 }
             }
 
@@ -80,22 +89,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun startSplashActivity() {
-        finish()
-        //startActivity(Intent(this, SplashActivity::class.java))
-    }
-
-    private fun startRegisterActivity() {
-        finish()
-        startActivity(Intent(this, RegisterActivity::class.java))
-    }
-
     private fun login(email: String, password: String) {
         mAuth?.signInWithEmailAndPassword(email, password)
             ?.addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d(TAG, "User logged in, starting SplashActivity")
-                    startSplashActivity()
+                    Log.d(TAG, "User logged in, starting SplashFragment")
+                    changeFragment(splashFragment)
 
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")

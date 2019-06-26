@@ -4,13 +4,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            tools:context=".activities.LoginActivity"
+            tools:context=".fragments.LoginFragment"
             android:fillViewport="true"
             android:paddingTop="12dp"
             android:paddingBottom="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:scrollbarStyle="outsideOverlay">
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:scrollbarStyle="outsideOverlay" tools:ignore="MissingDefaultResource">
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
