@@ -1,6 +1,5 @@
 package com.android.carrent.utils
 
-import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -22,8 +21,8 @@ fun setLogoAndFormFadeIn(context: Context, iv_logo: ImageView, form: LinearLayou
     form.startAnimation(formAnimation)
 }
 
-fun Activity.makeToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
-    Toast.makeText(this, message, duration).show()
+fun Fragment.makeToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, message, duration).show()
 }
 
 fun showProgressBar(b: ProgressBar) {
@@ -32,4 +31,11 @@ fun showProgressBar(b: ProgressBar) {
 
 fun hideProgressBar(b: ProgressBar) {
     b.visibility = View.INVISIBLE
+}
+
+fun Fragment.changeFragment(fragment: Fragment){
+    activity?.supportFragmentManager
+        ?.beginTransaction()
+        ?.replace(R.id.container, fragment)
+        ?.commit()
 }
