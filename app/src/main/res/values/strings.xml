@@ -7,6 +7,8 @@
     <string name="forgot_password">Forgot password</string>
     <string name="enter_valid_email">Enter valid email</string>
     <string name="passwords_no_match">Passwords didn`t match</string>
+    <string name="permissions_error">Login again to grant permissions.</string>
+    <string name="permissions_error_never">Go to settings to enable permissions.</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>
@@ -14,6 +16,15 @@
     <string name="hint_password">Enter password</string>
     <string name="hint_confirm_password">Confirm password</string>
     <string name="hint_phone_number">Enter phone number</string>
+
+    <!-- Loading tips -->
+    <string name="loading_tip_prefix">Quick tip:</string>
+
+    <string name="tip1">Search refreshes not only list, but map markers too.</string>
+    <string name="tip2">You can search by car plate number, geolocation, address and by more other details.</string>
+    <string name="tip3">Use sorting to find nearest cars.</string>
+
+
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

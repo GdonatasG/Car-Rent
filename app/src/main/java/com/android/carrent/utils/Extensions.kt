@@ -33,9 +33,9 @@ fun hideProgressBar(b: ProgressBar) {
     b.visibility = View.INVISIBLE
 }
 
-fun Fragment.changeFragment(fragment: Fragment){
+fun Fragment.changeFragment(fragment: Fragment) {
     activity?.supportFragmentManager
         ?.beginTransaction()
         ?.replace(R.id.container, fragment)
-        ?.commit()
+        ?.commitAllowingStateLoss()
 }
