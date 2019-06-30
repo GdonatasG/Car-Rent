@@ -18,17 +18,34 @@ import kotlinx.android.synthetic.main.fragment_register.*
 import kotlinx.android.synthetic.main.fragment_register.view.*
 
 class RegisterFragment : Fragment(), View.OnClickListener {
-    private var disabledWhileRegister = false
     private val TAG: String = "RegisterFragment"
+
+    // Variable to disable action while register
+    private var disabledWhileRegister = false
+
+    // Firebase
     private var mAuth: FirebaseAuth? = null
+
+    // Fragments
     private lateinit var splashFragment: SplashFragment
     private lateinit var loginFragment: LoginFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
+
+        // Init needed fragments
         splashFragment = SplashFragment()
         loginFragment = LoginFragment()
+
+
+        // If user is logged in, change fragment to SplashFragment
+        mAuth?.currentUser?.let {
+            Log.d(TAG, "User is already logged in, starting SplashFragment")
+            changeFragment(splashFragment)
+        }
     }
 
     override fun onCreateView(
@@ -37,10 +54,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     ): View? {
         // Inflate the layout for this fragment
         var v: View = inflater.inflate(R.layout.fragment_register, container, false)
-        mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting SplashFragment")
-            changeFragment(splashFragment)
-        }
 
         Log.d(TAG, "User is not logged in")
         setLogoAndFormFadeIn(context!!, v.iv_logo, v.register_form)
@@ -67,22 +80,22 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     private fun doValidations() {
         if (et_username.text.length == 0) {
-            et_username.error = getText(R.string.hint_username)
+            et_username.error = resources.getString(R.string.hint_username)
             et_username.requestFocus()
         } else if (!Patterns.EMAIL_ADDRESS.matcher(et_email.text).matches()) {
-            et_email.error = getText(R.string.enter_valid_email)
+            et_email.error = resources.getString(R.string.enter_valid_email)
             et_email.requestFocus()
         } else if (et_password.text.length == 0) {
-            et_password.error = getText(R.string.hint_password)
+            et_password.error = resources.getString(R.string.hint_password)
             et_password.requestFocus()
         } else if (et_password_confirm.text.length == 0) {
-            et_password_confirm.error = getText(R.string.hint_confirm_password)
+            et_password_confirm.error = resources.getString(R.string.hint_confirm_password)
             et_password_confirm.requestFocus()
         } else if (!et_password.text.toString().equals(et_password_confirm.text.toString())) {
-            et_password.error = getText(R.string.passwords_no_match)
+            et_password.error = resources.getString(R.string.passwords_no_match)
             et_password.requestFocus()
         } else if (et_phone.text.length == 0) {
-            et_phone.error = getText(R.string.hint_phone_number)
+            et_phone.error = resources.getString(R.string.hint_phone_number)
             et_phone.requestFocus()
         } else {
             // Register user

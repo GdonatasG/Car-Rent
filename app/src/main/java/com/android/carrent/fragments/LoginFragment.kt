@@ -16,17 +16,34 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
 
 class LoginFragment : Fragment(), View.OnClickListener {
-    private var disabledWhileLogin = false
     private var TAG: String = "LoginFragment"
+
+    // Variable to disable action while logging in
+    private var disabledWhileLogin = false
+
+    // Firebase
     private var mAuth: FirebaseAuth? = null
+
+    // Fragments
     private lateinit var splashFragment: SplashFragment
     private lateinit var registerFragment: RegisterFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
+
+        // Init needed fragments
         splashFragment = SplashFragment()
         registerFragment = RegisterFragment()
+
+
+        // If user is logged in, change fragment to SplashFragment
+        mAuth?.currentUser?.let {
+            Log.d(TAG, "User is already logged in, starting SplashFragment")
+            changeFragment(splashFragment)
+        }
     }
 
     override fun onCreateView(
@@ -35,10 +52,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
     ): View? {
 
         var v: View = inflater.inflate(R.layout.fragment_login, container, false)
-        mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting SplashFragment")
-            changeFragment(splashFragment)
-        }
 
         setLogoAndFormFadeIn(context!!, v.iv_logo, v.login_form)
 
@@ -76,16 +89,17 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
     private fun doValidations() {
         if (!Patterns.EMAIL_ADDRESS.matcher(et_email.text).matches()) {
-            et_email.error = getText(R.string.enter_valid_email)
+            et_email.error = resources.getString(R.string.enter_valid_email)
             et_email.requestFocus()
         } else if (et_password.text.length == 0) {
-            et_password.error = getText(R.string.hint_password)
+            et_password.error = resources.getString(R.string.hint_password)
             et_password.requestFocus()
         } else {
             // Login user
             disabledWhileLogin = true
             showProgressBar(progress_bar)
             login(et_email.text.toString(), et_password.text.toString())
+
         }
     }
 
