@@ -7,7 +7,6 @@ class User {
     var balance: Double? = null
     var rentedCarId: Int? = null
 
-
     constructor() {}
 
     constructor(username: String?, email: String?, phone: String?, balance: Double?, rentedCarId: Int?) {
