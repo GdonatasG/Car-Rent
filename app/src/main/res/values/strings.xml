@@ -24,12 +24,13 @@
     <string name="tip2">You can search by car plate number, geolocation, address and by more other details.</string>
     <string name="tip3">Use sorting to find nearest cars.</string>
 
-
+    // Navigation drawer, other menus
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_welcome">Welcome,</string>
+    <string name="nav_header_balance">69 €</string>
+    <string name="nav_header_currency_euro">€</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
