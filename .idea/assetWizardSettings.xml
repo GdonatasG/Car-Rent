@@ -92,8 +92,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="2e8b57" />
-                            <entry key="outputName" value="ic_directions_car_accent_100dp" />
+                            <entry key="color" value="aa2c0a" />
+                            <entry key="outputName" value="ic_directions_car_primary_dark_100dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\zitku" />
                           </map>

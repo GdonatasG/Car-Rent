@@ -3,7 +3,7 @@ package com.android.carrent.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.android.carrent.R
-import com.android.carrent.fragments.LoginFragment
+import com.android.carrent.fragments.main.LoginFragment
 
 class MainActivity : AppCompatActivity() {
 

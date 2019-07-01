@@ -1,4 +1,4 @@
-package com.android.carrent.fragments
+package com.android.carrent.fragments.main
 
 
 import android.os.Bundle

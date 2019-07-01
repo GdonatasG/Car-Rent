@@ -1,6 +1,7 @@
-package com.android.carrent.fragments
+package com.android.carrent.fragments.main
 
 import android.Manifest.permission.*
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 
 import com.android.carrent.R
+import com.android.carrent.activities.HomeActivity
 import com.android.carrent.utils.Constants.SPLASH_DELAY
 import com.android.carrent.utils.Constants.listOfLoadingTips
 import com.android.carrent.utils.changeFragment
@@ -75,7 +77,8 @@ class SplashFragment : Fragment() {
 
 
         // Setting custom quick tip
-        v.tv_tip.text = "" + resources.getString(R.string.loading_tip_prefix) + " " + resources.getString(getCustomTip())
+        v.tv_tip.text = resources.getString(R.string.loading_tip_prefix) + " " +
+                resources.getString(getCustomTip())
 
         return v
     }
@@ -86,10 +89,10 @@ class SplashFragment : Fragment() {
             .request(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_NETWORK_STATE)
             .subscribe { granted ->
                 if (granted) {
-                    Log.d(TAG, "All permissions granted")
+                    Log.d(TAG, "All permissions granted, starting HomeActivity")
                     mDelayHandler.postDelayed({
                         hideProgressBar(progress_bar)
-                        makeToast("GRANTED")
+                        startHomeActivity()
                     }, SPLASH_DELAY)
                 } else {
                     rxPermissions.shouldShowRequestPermissionRationale(
@@ -102,11 +105,11 @@ class SplashFragment : Fragment() {
                             if (canAskAgain) {
                                 Log.d(TAG, "User denied permissions without ask never again")
                                 signOut()
-                                makeToast(resources.getString(R.string.permissions_error).toString())
+                                makeToast(resources.getString(R.string.permissions_error))
                             } else {
                                 Log.d(TAG, "User denied permissions with ask never again")
                                 signOut()
-                                makeToast(resources.getString(R.string.permissions_error_never).toString())
+                                makeToast(resources.getString(R.string.permissions_error_never))
                             }
 
                         }
@@ -122,6 +125,11 @@ class SplashFragment : Fragment() {
 
     private fun getCustomTip(): Int {
         return listOfLoadingTips[Random().nextInt(listOfLoadingTips.size)]
+    }
+
+    private fun startHomeActivity() {
+        activity?.finish()
+        startActivity(Intent(activity, HomeActivity::class.java))
     }
 
 
