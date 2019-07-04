@@ -1,7 +1,10 @@
 package com.android.carrent.fragments.main
 
 import android.Manifest.permission.*
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -24,6 +27,12 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.android.synthetic.main.fragment_splash.view.*
 import java.util.*
+import androidx.appcompat.app.AlertDialog
+import com.android.carrent.utils.Constants.PERMISSIONS_REQUEST_ENABLE_GPS
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.android.carrent.utils.Constants.ERROR_DIALOG_REQUEST
+
 
 class SplashFragment : Fragment() {
     private var TAG: String = "SplashFragment"
@@ -61,9 +70,13 @@ class SplashFragment : Fragment() {
         // Requesting permissions
         rxPermissions = RxPermissions(activity!!)
         rxPermissions.setLogging(true)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.d(TAG, "Requesting permissions")
-            requestPermissions()
+        if (checkMapServices()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Log.d(TAG, "Requesting permissions")
+                requestPermissions()
+            }
+
+
         }
 
     }
@@ -93,6 +106,7 @@ class SplashFragment : Fragment() {
                     mDelayHandler.postDelayed({
                         hideProgressBar(progress_bar)
                         startHomeActivity()
+
                     }, SPLASH_DELAY)
                 } else {
                     rxPermissions.shouldShowRequestPermissionRationale(
@@ -132,5 +146,51 @@ class SplashFragment : Fragment() {
         startActivity(Intent(activity, HomeActivity::class.java))
     }
 
+    private fun checkMapServices(): Boolean {
+        if (isServicesOk()) {
+            if (isMapsEnabled()) {
+                return true
+            }
+        }
+        return false
+    }
 
+    private fun isMapsEnabled(): Boolean {
+        var locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.d(TAG, "Gps disabled")
+            buildAlertMessageNoGps()
+            return false
+        }
+
+        return true
+    }
+
+    private fun buildAlertMessageNoGps() {
+        val builder = AlertDialog.Builder(activity!!)
+        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+            .setCancelable(false)
+            .setPositiveButton("Yes") { dialog, id ->
+                val enableGpsIntent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS)
+            }
+        val alert = builder.create()
+        alert.show()
+    }
+
+    private fun isServicesOk(): Boolean {
+        var available: Int = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
+
+        if (available == ConnectionResult.SUCCESS) {
+            Log.d(TAG, "Google API connection is ok")
+            return true
+        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
+            val dialog: Dialog =
+                GoogleApiAvailability.getInstance().getErrorDialog(activity, available, ERROR_DIALOG_REQUEST)
+            dialog.show()
+        } else makeToast(resources.getString(R.string.maps_error))
+
+        return false
+    }
 }

@@ -1,4 +1,6 @@
 <resources>
+    <string name="maps_api">AIzaSyBp2iCJOmchco1BW7zIgIZ9Rc1nwv-dl_4</string>
+    
     <string name="app_name">Car Rent</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
@@ -10,6 +12,7 @@
     <string name="permissions_error">Login again to grant permissions.</string>
     <string name="permissions_error_never">Go to settings to enable permissions.</string>
     <string name="logout_press_again">Click again to confirm logout.</string>
+    <string name="maps_error">Error: can`t make map requests.</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>
