@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".fragments.main.RegisterFragment"
-            android:fillViewport="true"
-            android:paddingTop="12dp"
-            android:paddingBottom="15dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:scrollbarStyle="outsideOverlay">
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/colorPrimaryDark"
+        tools:context=".fragments.main.RegisterFragment"
+        android:fillViewport="true"
+        android:paddingTop="12dp"
+        android:paddingBottom="15dp"
+        android:scrollbarStyle="outsideOverlay">
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -25,19 +25,13 @@
         <LinearLayout
                 android:id="@+id/register_form"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:padding="20dp"
                 android:orientation="vertical"
-                android:gravity="center_vertical"
+                android:layout_gravity="center"
                 android:focusable="false"
                 android:focusableInTouchMode="true">
-
-            <TextView
-                    style="@style/TextPrimaryBold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/register"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="20dp"/>
 
             <EditText
                     android:id="@+id/et_username"
@@ -45,6 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_username"
+                    android:drawableLeft="@drawable/ic_person_lightgray_24dp"
                     android:inputType="textPersonName"/>
 
             <EditText
@@ -53,32 +48,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_email"
+                    android:drawableLeft="@drawable/ic_email_lightgray_24dp"
                     android:inputType="textEmailAddress"/>
 
-            <LinearLayout
+
+            <EditText
+                    android:id="@+id/et_password"
+                    style="@style/EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
+                    android:hint="@string/hint_password"
+                    android:drawableLeft="@drawable/ic_lock_lightgray_24dp"
+                    android:inputType="textPassword"/>
 
-                <EditText
-                        android:id="@+id/et_password"
-                        style="@style/EditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/hint_password"
-                        android:inputType="textPassword"/>
-
-                <EditText
-                        android:id="@+id/et_password_confirm"
-                        style="@style/EditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/hint_confirm_password"
-                        android:inputType="textPassword"/>
-            </LinearLayout>
+            <EditText
+                    android:id="@+id/et_password_confirm"
+                    style="@style/EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_confirm_password"
+                    android:drawableLeft="@drawable/ic_lock_lightgray_24dp"
+                    android:inputType="textPassword"/>
 
             <EditText
                     android:id="@+id/et_phone"
@@ -86,6 +76,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_phone_number"
+                    android:drawableLeft="@drawable/ic_phone_lightgray_24dp"
                     android:inputType="phone"/>
 
             <ProgressBar
@@ -99,15 +90,21 @@
                     android:layout_height="wrap_content"
                     android:text="@string/register"/>
 
-            <TextView
-                    android:id="@+id/tv_goto_login"
-                    style="@style/TextSecondaryItalic"
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_gravity="center_horizontal"
-                    android:layout_margin="10dp"
-                    android:gravity="center"
-                    android:text="@string/already_registered"/>
+                    android:layout_margin="@dimen/second_options_layout_margin">
+                <TextView
+                        android:id="@+id/tv_goto_login"
+                        style="@style/TextSecondOptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center"
+                        android:text="@string/already_registered"/>
+            </LinearLayout>
 
         </LinearLayout>
 

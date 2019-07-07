@@ -14,6 +14,9 @@ import com.android.carrent.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+
 
 class LoginFragment : Fragment(), View.OnClickListener {
     private var TAG: String = "LoginFragment"
@@ -91,7 +94,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
         if (!Patterns.EMAIL_ADDRESS.matcher(et_email.text).matches()) {
             et_email.error = resources.getString(R.string.enter_valid_email)
             et_email.requestFocus()
-        } else if (et_password.text.length == 0) {
+        } else if (et_password.text?.length == 0) {
             et_password.error = resources.getString(R.string.hint_password)
             et_password.requestFocus()
         } else {

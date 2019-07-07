@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
@@ -45,16 +46,15 @@ class HomeFragment : Fragment() {
         var v: View = inflater.inflate(R.layout.fragment_home, container, false)
 
         // toolbar
-        (activity as AppCompatActivity).setSupportActionBar(v.toolbar)
-        v.toolbar.setTitleTextColor(resources.getColor(R.color.colorAccent))
+        (activity as AppCompatActivity).setSupportActionBar(v.toolbar as Toolbar)
         setHasOptionsMenu(true)
         // Init user balance into toolbar
-        initBalance(v)
+        initBalance()
 
         return v
     }
 
-    private fun initBalance(v: View?) {
+    private fun initBalance() {
         FirebaseDatabase.getInstance().getReference("/users/${mAuth?.currentUser?.uid}")
             .addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
                 override fun onDataChange(p0: DataSnapshot) {
                     if (p0.exists()) {
                         val user = p0.getValue(User::class.java)!!
-                        v?.toolbar?.title = user.balance.toString() + " " +
+                        (activity as AppCompatActivity).supportActionBar?.title = user.balance.toString() + " " +
                                 resources.getText(R.string.nav_header_currency_euro)
                     }
                 }
