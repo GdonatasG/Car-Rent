@@ -5,6 +5,7 @@
         android:layout_height="wrap_content"
         app:titleTextColor="@color/orange"
         app:subtitleTextAppearance="@android:color/white"
+        app:titleTextAppearance="@style/ToolbarTitleFont"
         app:title=" "
-        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:theme="@style/ToolbarTheme"/>

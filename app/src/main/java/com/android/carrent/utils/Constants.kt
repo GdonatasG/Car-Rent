@@ -22,4 +22,6 @@ object Constants {
 
     )
 
+    val MAPVIEW_BUNDLE_KEY = "MapViewBundleKey"
+
 }
