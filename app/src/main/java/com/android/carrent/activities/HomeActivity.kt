@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
 import com.android.carrent.fragments.home.HomeFragment
@@ -28,6 +29,9 @@ class HomeActivity : AppCompatActivity() {
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
 
+        // Init toolbar
+        setSupportActionBar(toolbar as Toolbar)
+
         if (mAuth?.currentUser == null) {
             Log.d(TAG, "User is not logged in, starting MainActivity")
             startMainActivity()
@@ -49,11 +53,13 @@ class HomeActivity : AppCompatActivity() {
             }
             R.id.navigation_profile -> {
                 Log.d(TAG, "Clicked on BottomNavigation profile item")
+                supportActionBar?.title = "My Profile"
                 setFragment(fragment = ProfileFragment())
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_rented -> {
                 Log.d(TAG, "Clicked on BottomNavigation rented item")
+                supportActionBar?.title = "My Car"
                 setFragment(fragment = RentedFragment())
                 return@OnNavigationItemSelectedListener true
             }

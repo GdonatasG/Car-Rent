@@ -1,17 +1,23 @@
 package com.android.carrent.fragments.home
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.models.User
+import com.android.carrent.utils.Constants.MAPVIEW_BUNDLE_KEY
 import com.android.carrent.utils.makeToast
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,12 +25,18 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), OnMapReadyCallback {
     private var TAG: String = "HomeActivity"
     private var typeOfSort: Int = 0
 
     // Firebase
     private var mAuth: FirebaseAuth? = null
+
+    // Widgets
+    private lateinit var mMap: MapView
+
+    // GoogleMap
+    private lateinit var mGoogleMap: GoogleMap
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +58,56 @@ class HomeFragment : Fragment() {
         var v: View = inflater.inflate(R.layout.fragment_home, container, false)
 
         // toolbar
-        (activity as AppCompatActivity).setSupportActionBar(v.toolbar as Toolbar)
         setHasOptionsMenu(true)
+
         // Init user balance into toolbar
         initBalance()
 
+        // Init map
+        mMap = v.mapview
+        initMap(savedInstanceState)
+
         return v
+    }
+
+    private fun initMap(savedInstanceState: Bundle?) {
+        var mapViewBundle: Bundle? = null
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY)
+        }
+
+        mMap.onCreate(mapViewBundle)
+
+        mMap.getMapAsync(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        var mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY)
+        if (mapViewBundle == null) {
+            mapViewBundle = Bundle()
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle)
+        }
+
+        mMap.onSaveInstanceState(mapViewBundle)
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        if (ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+        map.isMyLocationEnabled = true
+        map.uiSettings.isMyLocationButtonEnabled = true
+        mGoogleMap = map
+
+
     }
 
     private fun initBalance() {
@@ -128,5 +184,35 @@ class HomeFragment : Fragment() {
     private fun startMainActivity() {
         activity?.finish()
         startActivity(Intent(activity, MainActivity::class.java))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mMap.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mMap.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMap.onStop()
+    }
+
+    override fun onPause() {
+        mMap.onPause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        mMap.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mMap.onLowMemory()
     }
 }
