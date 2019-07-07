@@ -6,13 +6,8 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         tools:context=".fragments.home.HomeFragment">
 
-    <androidx.appcompat.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/nav_header_currency_euro"
-            android:layout_alignParentStart="true"
-            android:background="@color/colorPrimary"/>
+    <include
+            layout="@layout/toolbar"
+            android:id="@+id/toolbar"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
