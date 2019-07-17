@@ -14,12 +14,6 @@
             android:layout_below="@+id/toolbar"
             android:weightSum="100">
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="50"
-                android:id="@+id/rv_list"/>
-
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -32,6 +26,12 @@
                     android:layout_height="match_parent"
                     android:id="@+id/mapview"/>
         </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:id="@+id/rv_list"/>
 
 
     </LinearLayout>
