@@ -10,6 +10,7 @@ import com.android.carrent.R
 import com.android.carrent.fragments.home.HomeFragment
 import com.android.carrent.fragments.home.ProfileFragment
 import com.android.carrent.fragments.home.RentedFragment
+import com.android.carrent.utils.MapServiceGpsRequests
 import com.android.carrent.utils.makeToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,8 @@ class HomeActivity : AppCompatActivity() {
 
     // Firebase
     private var mAuth: FirebaseAuth? = null
+    // MapServiceGpsRequests
+    private lateinit var mMapServiceGpsRequests: MapServiceGpsRequests
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +31,8 @@ class HomeActivity : AppCompatActivity() {
 
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
-
+        // Init MapServiceGpsRequests
+        mMapServiceGpsRequests = MapServiceGpsRequests(this)
         // Init toolbar
         setSupportActionBar(toolbar as Toolbar)
 
@@ -37,8 +41,8 @@ class HomeActivity : AppCompatActivity() {
             startMainActivity()
         }
 
-        if (savedInstanceState == null) {
-            setFragment(HomeFragment())
+        if (savedInstanceState == null && mMapServiceGpsRequests.isServicesOk()) {
+            setFragment(fragment = HomeFragment())
         }
 
         bottom_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -48,8 +52,11 @@ class HomeActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_home -> {
                 Log.d(TAG, "Clicked on BottomNavigation home_main_menu item")
-                setFragment(fragment = HomeFragment())
-                return@OnNavigationItemSelectedListener true
+                if (mMapServiceGpsRequests.isServicesOk()) {
+                    setFragment(fragment = HomeFragment())
+                    return@OnNavigationItemSelectedListener true
+                }
+
             }
             R.id.navigation_profile -> {
                 Log.d(TAG, "Clicked on BottomNavigation profile item")

@@ -1,8 +1,12 @@
 package com.android.carrent.fragments.home
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -13,8 +17,16 @@ import androidx.core.app.ActivityCompat
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.models.User
+import com.android.carrent.utils.*
+import com.android.carrent.utils.Constants.FASTEST_INTERVAL
+import com.android.carrent.utils.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
+import com.android.carrent.utils.Constants.LOCATION_PERMISSIONS_REQUEST
 import com.android.carrent.utils.Constants.MAPVIEW_BUNDLE_KEY
-import com.android.carrent.utils.makeToast
+import com.android.carrent.utils.Constants.UPDATE_INTERVAL
+import com.android.carrent.utils.Constants.PERMISSIONS
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -25,16 +37,24 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
-class HomeFragment : Fragment(), OnMapReadyCallback {
+@Suppress("DEPRECATION")
+class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+
     private var TAG: String = "HomeActivity"
     private var typeOfSort: Int = 0
-
+    // Is first attempt of location request
+    private var isFirstAttempt = true
+    // Location
+    private lateinit var mMapServiceGpsRequests: MapServiceGpsRequests
+    private var mGoogleApiClient: GoogleApiClient? = null
+    private var mLocation: Location? = null
+    private var mLocationManager: LocationManager? = null
+    private var mLocationRequest: LocationRequest? = null
     // Firebase
     private var mAuth: FirebaseAuth? = null
-
     // Widgets
     private lateinit var mMap: MapView
-
     // GoogleMap
     private lateinit var mGoogleMap: GoogleMap
 
@@ -48,6 +68,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             Log.d(TAG, "User is not logged in, starting MainActivity")
             startMainActivity()
         }
+
+
     }
 
     override fun onCreateView(
@@ -63,51 +85,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         // Init user balance into toolbar
         initBalance()
 
-        // Init map
+        // map init, location updates
         mMap = v.mapview
         initMap(savedInstanceState)
 
+        configureGoogleApiClient()
+        mLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        mMapServiceGpsRequests = MapServiceGpsRequests(activity!!)
+
+        mMapServiceGpsRequests.checkLocation()
+
         return v
-    }
-
-    private fun initMap(savedInstanceState: Bundle?) {
-        var mapViewBundle: Bundle? = null
-        if (savedInstanceState != null) {
-            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY)
-        }
-
-        mMap.onCreate(mapViewBundle)
-
-        mMap.getMapAsync(this)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        var mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY)
-        if (mapViewBundle == null) {
-            mapViewBundle = Bundle()
-            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle)
-        }
-
-        mMap.onSaveInstanceState(mapViewBundle)
-    }
-
-    override fun onMapReady(map: GoogleMap) {
-        if (ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
-        map.isMyLocationEnabled = true
-        map.uiSettings.isMyLocationButtonEnabled = true
-        mGoogleMap = map
-
-
     }
 
     private fun initBalance() {
@@ -128,6 +116,136 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             })
     }
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        var mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY)
+        if (mapViewBundle == null) {
+            mapViewBundle = Bundle()
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle)
+        }
+
+        mMap.onSaveInstanceState(mapViewBundle)
+    }
+
+    private fun initMap(savedInstanceState: Bundle?) {
+        var mapViewBundle: Bundle? = null
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY)
+        }
+
+        mMap.onCreate(mapViewBundle)
+
+        mMap.getMapAsync(this)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(map: GoogleMap) {
+        mGoogleMap = map
+        setCameraViewWBounds(mGoogleMap, LAT_LNG_BOUNDS_OF_LITHUANIA)
+
+        if (checkPermissions()) {
+            enableDeviceLocationWButton(map)
+
+        } else requestLocationPermissions(LOCATION_PERMISSIONS_REQUEST)
+    }
+
+    private fun configureGoogleApiClient() {
+        mGoogleApiClient = GoogleApiClient.Builder(context!!)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .addApi(LocationServices.API)
+            .build()
+    }
+
+    private fun checkPermissions(): Boolean {
+        return (ActivityCompat.checkSelfPermission(
+            context!!,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(
+            context!!,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                )
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onConnected(p0: Bundle?) {
+        if (checkPermissions()) {
+            enableDeviceLocationWButton(mGoogleMap)
+            startLocationUpdates()
+
+            mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)
+
+            if (mLocation == null) {
+                startLocationUpdates()
+            }
+            if (mLocation != null) {
+
+            } else {
+
+            }
+        } else requestLocationPermissions(LOCATION_PERMISSIONS_REQUEST)
+
+    }
+
+    @SuppressLint("MissingPermission")
+    protected fun startLocationUpdates() {
+        // Create the location request
+        mLocationRequest = LocationRequest.create()
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(UPDATE_INTERVAL)
+            .setFastestInterval(FASTEST_INTERVAL)
+        // Request location updates
+        if (checkPermissions()) {
+            enableDeviceLocationWButton(mGoogleMap)
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient,
+                mLocationRequest, this
+            )
+        } else requestLocationPermissions(LOCATION_PERMISSIONS_REQUEST)
+
+    }
+
+    override fun onConnectionSuspended(p0: Int) {
+        Log.i(TAG, "Connection Suspended")
+        mGoogleApiClient!!.connect()
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+        Log.i(TAG, "Connection failed. Error: " + p0.getErrorCode())
+    }
+
+    override fun onLocationChanged(p0: Location?) {
+        // Move camera to device location if it`s first attempt of location request
+        if (isFirstAttempt) {
+            setCameraView(googleMap = mGoogleMap, location = p0)
+            isFirstAttempt = false
+        }
+    }
+
+    private fun requestLocationPermissions(requestCode: Int) {
+        requestPermissions(PERMISSIONS.toTypedArray(), requestCode)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            LOCATION_PERMISSIONS_REQUEST -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    enableDeviceLocationWButton(mGoogleMap)
+                    startLocationUpdates()
+                } else makeToast(resources.getString(R.string.permissions_error))
+                return
+            }
+            else -> {
+                // Ignore all other requests.
+            }
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         var menuInflater: MenuInflater = activity!!.menuInflater
         menuInflater.inflate(R.menu.home_main_menu, menu)
@@ -137,7 +255,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.btn_search -> {
-                println("clicked on btn search")
             }
             R.id.btn_sort -> {
                 view?.let {
@@ -194,11 +311,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         mMap.onStart()
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient!!.connect()
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mMap.onStop()
+        if (mGoogleApiClient!!.isConnected()) {
+            mGoogleApiClient!!.disconnect()
+        }
     }
 
     override fun onPause() {
