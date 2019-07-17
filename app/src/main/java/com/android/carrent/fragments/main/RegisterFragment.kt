@@ -12,8 +12,9 @@ import android.view.ViewGroup
 import com.android.carrent.R
 import com.android.carrent.models.User
 import com.android.carrent.utils.*
+import com.android.carrent.utils.Constants.FIRESTORE_USERS_REFERENCE
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_register.*
 import kotlinx.android.synthetic.main.fragment_register.view.*
 
@@ -107,7 +108,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 et_email.text.toString(),
                 et_password.text.toString(),
                 et_phone.text.toString(),
-                0.0,
+                0f,
                 0
             )
         }
@@ -118,7 +119,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         email: String,
         password: String,
         phone: String,
-        balance: Double?,
+        balance: Float?,
         rentedCarId: Int?
     ) {
         mAuth?.createUserWithEmailAndPassword(email, password)
@@ -126,19 +127,20 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 if (it.isSuccessful) {
                     Log.d(TAG, "Registration completed!")
                     val uid = FirebaseAuth.getInstance().uid ?: ""
-                    val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+                    val ref = FirebaseFirestore.getInstance().collection(FIRESTORE_USERS_REFERENCE).document(uid)
 
-                    val user = User(username, email, phone, balance, rentedCarId)
-                    ref.setValue(user).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            Log.d(TAG, "User added into database!")
-                            changeFragment(splashFragment)
-                        } else {
-                            makeToast(it.exception?.message.toString())
-                            hideProgressBar(progress_bar)
-                            disabledWhileRegister = false
+                    val user = User(uid, username, email, phone, balance, rentedCarId)
+                    ref.set(user)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Log.d(TAG, "User added into firestore!")
+                                changeFragment(splashFragment)
+                            } else {
+                                makeToast(it.exception?.message.toString())
+                                hideProgressBar(progress_bar)
+                                disabledWhileRegister = false
+                            }
                         }
-                    }
                 } else {
                     makeToast(it.exception?.message.toString())
                     hideProgressBar(progress_bar)

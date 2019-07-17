@@ -10,6 +10,9 @@ object Constants {
     val LOGO_ANIMATION_DURATION: Long = 800
     val FORM_ANIMATION_DURATION: Long = 1700
 
+    // Firestore
+    val FIRESTORE_USERS_REFERENCE: String = "users"
+
     // Location, location PERMISSIONS
     val PERMISSIONS = listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     val DEFAULT_ZOOM = 14f
@@ -21,7 +24,6 @@ object Constants {
 
     // Requests
     val LOCATION_PERMISSIONS_REQUEST = 1001
-    val LOCATION_PERMISSIONS_REQUEST_FOR_GPS = 1002
     val ERROR_DIALOG_REQUEST = 1003
     val GPS_REQUEST = 1004
 

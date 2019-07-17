@@ -19,6 +19,7 @@ import com.android.carrent.activities.MainActivity
 import com.android.carrent.models.User
 import com.android.carrent.utils.*
 import com.android.carrent.utils.Constants.FASTEST_INTERVAL
+import com.android.carrent.utils.Constants.FIRESTORE_USERS_REFERENCE
 import com.android.carrent.utils.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
 import com.android.carrent.utils.Constants.LOCATION_PERMISSIONS_REQUEST
 import com.android.carrent.utils.Constants.MAPVIEW_BUNDLE_KEY
@@ -31,10 +32,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
 @Suppress("DEPRECATION")
@@ -99,23 +97,26 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     private fun initBalance() {
-        FirebaseDatabase.getInstance().getReference("/users/${mAuth?.currentUser?.uid}")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    makeToast(p0.message)
+        val ref = FirebaseFirestore.getInstance().collection(FIRESTORE_USERS_REFERENCE).document(mAuth?.uid.toString())
+
+        ref
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    return@addSnapshotListener
                 }
 
-                override fun onDataChange(p0: DataSnapshot) {
-                    if (p0.exists()) {
-                        val user = p0.getValue(User::class.java)!!
-                        (activity as AppCompatActivity).supportActionBar?.title = user.balance.toString() + " " +
-                                resources.getText(R.string.nav_header_currency_euro)
-                    }
+                if (snapshot != null && snapshot.exists()) {
+                    val user = snapshot.toObject(User::class.java)
+                    (activity as AppCompatActivity).supportActionBar?.title = user?.balance.toString() + " " +
+                            resources.getText(R.string.nav_header_currency_euro)
+                } else {
+                    Log.d(TAG, "Snapshot data: null")
                 }
 
-            })
+
+            }
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
