@@ -1,6 +1,6 @@
 package com.android.carrent.models
 
-import com.google.firebase.database.Exclude
+import com.google.firebase.firestore.Exclude
 
 class User {
     @Exclude
