@@ -15,6 +15,7 @@ import com.android.carrent.utils.*
 import com.android.carrent.utils.Constants.FIRESTORE_USERS_REFERENCE
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_register.*
 import kotlinx.android.synthetic.main.fragment_register.view.*
 

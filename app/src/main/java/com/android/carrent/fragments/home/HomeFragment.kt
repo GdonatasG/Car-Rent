@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
+import com.android.carrent.models.Car.Car
 import com.android.carrent.models.User
 import com.android.carrent.utils.*
 import com.android.carrent.utils.Constants.FASTEST_INTERVAL
