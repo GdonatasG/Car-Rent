@@ -1,6 +1,7 @@
 package com.android.carrent.fragments.main
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.carrent.R
+import com.android.carrent.activities.HomeActivity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
@@ -26,7 +28,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
     private var mAuth: FirebaseAuth? = null
 
     // Fragments
-    private lateinit var splashFragment: SplashFragment
     private lateinit var registerFragment: RegisterFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,14 +37,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
         mAuth = FirebaseAuth.getInstance()
 
         // Init needed fragments
-        splashFragment = SplashFragment()
         registerFragment = RegisterFragment()
 
 
         // If user is logged in, change fragment to SplashFragment
         mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting SplashFragment")
-            changeFragment(splashFragment)
+            Log.d(TAG, "User is already logged in, starting HomeActivity")
+            startHomeActivity()
         }
     }
 
@@ -109,7 +109,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             ?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     Log.d(TAG, "User logged in, starting SplashFragment")
-                    changeFragment(splashFragment)
+                    startHomeActivity()
 
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
@@ -118,5 +118,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     hideProgressBar(progress_bar)
                 }
             }
+    }
+
+    private fun startHomeActivity() {
+        activity?.finish()
+        startActivity(Intent(activity, HomeActivity::class.java))
     }
 }

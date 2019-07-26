@@ -26,6 +26,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var mMapServiceGpsRequests: MapServiceGpsRequests
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.SplashThemeHome)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 

@@ -1,6 +1,7 @@
 package com.android.carrent.fragments.main
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -10,8 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.carrent.R
+import com.android.carrent.activities.HomeActivity
 import com.android.carrent.models.User
-import com.android.carrent.utils.Constants.FIRESTORE_USERS_REFERENCE
+import com.android.carrent.utils.Constants
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,7 +30,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     private var mAuth: FirebaseAuth? = null
 
     // Fragments
-    private lateinit var splashFragment: SplashFragment
     private lateinit var loginFragment: LoginFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,14 +39,13 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         mAuth = FirebaseAuth.getInstance()
 
         // Init needed fragments
-        splashFragment = SplashFragment()
         loginFragment = LoginFragment()
 
 
         // If user is logged in, change fragment to SplashFragment
         mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting SplashFragment")
-            changeFragment(splashFragment)
+            Log.d(TAG, "User is already logged in, starting HomeActivity")
+            startHomeActivity()
         }
     }
 
@@ -56,7 +56,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         // Inflate the layout for this fragment
         var v: View = inflater.inflate(R.layout.fragment_register, container, false)
 
-        Log.d(TAG, "User is not logged in")
         setLogoAndFormFadeIn(context!!, v.iv_logo, v.register_form)
 
         v.btn_register.setOnClickListener(this)
@@ -127,14 +126,15 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 if (it.isSuccessful) {
                     Log.d(TAG, "Registration completed!")
                     val uid = FirebaseAuth.getInstance().uid ?: ""
-                    val ref = FirebaseFirestore.getInstance().collection(FIRESTORE_USERS_REFERENCE).document(uid)
+                    val ref =
+                        FirebaseFirestore.getInstance().collection(Constants.FIRESTORE_USERS_REFERENCE).document(uid)
 
                     val user = User(uid, username, email, phone, balance, rentedCarId)
                     ref.set(user)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
                                 Log.d(TAG, "User added into firestore!")
-                                changeFragment(splashFragment)
+                                startHomeActivity()
                             } else {
                                 makeToast(it.exception?.message.toString())
                                 hideProgressBar(progress_bar)
@@ -148,5 +148,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 }
             }
 
+    }
+
+    private fun startHomeActivity() {
+        activity?.finish()
+        startActivity(Intent(activity, HomeActivity::class.java))
     }
 }
