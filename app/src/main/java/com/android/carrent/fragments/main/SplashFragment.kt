@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_splash.view.*
 import java.util.*
 import com.android.carrent.utils.*
+import com.android.carrent.utils.extensions.changeFragment
 
 
 class SplashFragment : Fragment() {

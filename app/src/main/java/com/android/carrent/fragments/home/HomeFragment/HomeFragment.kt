@@ -1,4 +1,4 @@
-package com.android.carrent.fragments.home
+package com.android.carrent.fragments.home.HomeFragment
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,19 +13,22 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
-import com.android.carrent.models.Car.Car
-import com.android.carrent.models.User
 import com.android.carrent.utils.*
 import com.android.carrent.utils.Constants.FASTEST_INTERVAL
-import com.android.carrent.utils.Constants.FIRESTORE_USERS_REFERENCE
 import com.android.carrent.utils.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
 import com.android.carrent.utils.Constants.LOCATION_PERMISSIONS_REQUEST
 import com.android.carrent.utils.Constants.MAPVIEW_BUNDLE_KEY
 import com.android.carrent.utils.Constants.UPDATE_INTERVAL
 import com.android.carrent.utils.Constants.PERMISSIONS
+import com.android.carrent.utils.extensions.enableDeviceLocationWButton
+import com.android.carrent.utils.extensions.makeToast
+import com.android.carrent.utils.extensions.setCameraView
+import com.android.carrent.utils.extensions.setCameraViewWBounds
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -33,7 +36,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
 @Suppress("DEPRECATION")
@@ -44,6 +46,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var typeOfSort: Int = 0
     // Is first attempt of location request
     private var isFirstAttempt = true
+    // ViewModel
+    private lateinit var viewModel: HomeFragmentViewModel
     // Location
     private lateinit var mMapServiceGpsRequests: MapServiceGpsRequests
     private var mGoogleApiClient: GoogleApiClient? = null
@@ -81,6 +85,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         // toolbar
         setHasOptionsMenu(true)
 
+        // Init ViewModel
+        viewModel = ViewModelProviders.of(activity!!).get(HomeFragmentViewModel::class.java)
+
         // Init user balance into toolbar
         initBalance()
 
@@ -98,25 +105,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     private fun initBalance() {
-        val ref = FirebaseFirestore.getInstance().collection(FIRESTORE_USERS_REFERENCE).document(mAuth?.uid.toString())
-
-        ref
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null && snapshot.exists()) {
-                    val user = snapshot.toObject(User::class.java)
-                    (activity as AppCompatActivity).supportActionBar?.title = user?.balance.toString() + " " +
-                            resources.getText(R.string.nav_header_currency_euro)
-                } else {
-                    Log.d(TAG, "Snapshot data: null")
-                }
-
-
-            }
+        viewModel.getUser(mAuth!!.uid.toString()).observe(this, Observer { it ->
+            (activity as AppCompatActivity).supportActionBar?.title = it.balance.toString() + " " +
+                    resources.getText(R.string.nav_header_currency_euro)
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -10,12 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.carrent.R
-import com.android.carrent.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
+import com.android.carrent.utils.extensions.*
 
 
 class LoginFragment : Fragment(), View.OnClickListener {

@@ -7,11 +7,11 @@ import android.util.Log
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
-import com.android.carrent.fragments.home.HomeFragment
+import com.android.carrent.fragments.home.HomeFragment.HomeFragment
 import com.android.carrent.fragments.home.ProfileFragment
 import com.android.carrent.fragments.home.RentedFragment
 import com.android.carrent.utils.MapServiceGpsRequests
-import com.android.carrent.utils.makeToast
+import com.android.carrent.utils.extensions.makeToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_home.*
