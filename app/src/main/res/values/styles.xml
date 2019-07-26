@@ -8,6 +8,16 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+
+    <style name="SplashThemeHome" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@drawable/splash_home</item>
+    </style>
+
     <style name="TextPrimaryBold">
         <item name="android:textColor">@color/colorPrimaryDark</item>
         <item name="android:textSize">28sp</item>
