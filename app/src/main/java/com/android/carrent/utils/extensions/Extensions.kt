@@ -1,4 +1,4 @@
-package com.android.carrent.utils
+package com.android.carrent.utils.extensions
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
+import com.android.carrent.utils.Constants
 import com.android.carrent.utils.Constants.COUNTRY_ZOOM
 import com.android.carrent.utils.Constants.DEFAULT_ZOOM
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -52,28 +53,4 @@ fun Fragment.changeFragment(fragment: Fragment) {
         ?.beginTransaction()
         ?.replace(R.id.container, fragment)
         ?.commitAllowingStateLoss()
-}
-
-fun setCameraView(googleMap: GoogleMap, location: Location?) {
-    googleMap.moveCamera(
-        CameraUpdateFactory.newLatLngZoom(
-            LatLng(location!!.latitude, location.longitude),
-            DEFAULT_ZOOM
-        )
-    )
-}
-
-fun setCameraViewWBounds(googleMap: GoogleMap, bounds: LatLngBounds) {
-    googleMap.moveCamera(
-        CameraUpdateFactory.newLatLngZoom(
-            bounds.center,
-            COUNTRY_ZOOM
-        )
-    )
-}
-
-@SuppressLint("MissingPermission")
-fun enableDeviceLocationWButton(googleMap: GoogleMap){
-    googleMap.isMyLocationEnabled = true
-    googleMap.uiSettings.isMyLocationButtonEnabled = true
 }

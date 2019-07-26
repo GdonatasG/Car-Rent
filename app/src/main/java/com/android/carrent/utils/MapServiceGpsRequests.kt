@@ -8,9 +8,9 @@ import android.location.LocationManager
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat.startActivityForResult
 import com.android.carrent.R
 import com.android.carrent.utils.Constants.GPS_REQUEST
+import com.android.carrent.utils.extensions.makeToast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 
