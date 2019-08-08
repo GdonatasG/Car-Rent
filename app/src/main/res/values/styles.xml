@@ -71,6 +71,13 @@
         <item name="android:indeterminateTint">@color/lightgray</item>
     </style>
 
+    <style name="progress_bar_dark">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:visibility">visible</item>
+        <item name="android:indeterminateTint">@color/colorPrimary</item>
+    </style>
+
     <style name="iv_logo">
         <item name="android:layout_width">100dp</item>
         <item name="android:layout_height">100dp</item>

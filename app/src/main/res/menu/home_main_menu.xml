@@ -8,10 +8,5 @@
             android:title="Filter"
             app:actionViewClass="androidx.appcompat.widget.SearchView"
             app:showAsAction="ifRoom|collapseActionView"/>
-    <item
-            android:id="@+id/btn_sort"
-            android:icon="@drawable/ic_sort_by_alpha_white_24dp"
-            android:title="Sort"
-            app:showAsAction="always"/>
 
 </menu>

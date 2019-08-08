@@ -4,8 +4,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName
 
 class Rent {
-    @PropertyName("isRented")
-    var isRented: Boolean? = null
+    @PropertyName("rented")
+    var rented: Boolean? = null
     @PropertyName("rentStarted")
     var rentStarted: Timestamp? = null
     @PropertyName("rentedUntil")
@@ -15,8 +15,8 @@ class Rent {
 
     constructor() {}
 
-    constructor(isRented: Boolean?, rentStarted: Timestamp?, rentedUntil: Timestamp?, rentedById: String?) {
-        this.isRented = isRented
+    constructor(rented: Boolean?, rentStarted: Timestamp?, rentedUntil: Timestamp?, rentedById: String?) {
+        this.rented = rented
         this.rentStarted = rentStarted
         this.rentedUntil = rentedUntil
         this.rentedById = rentedById

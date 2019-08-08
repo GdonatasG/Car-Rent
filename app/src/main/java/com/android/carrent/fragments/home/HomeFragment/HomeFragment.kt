@@ -15,9 +15,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
+import com.android.carrent.adapters.CarAdapter
+import com.android.carrent.models.Car.Car
 import com.android.carrent.utils.*
 import com.android.carrent.utils.Constants.FASTEST_INTERVAL
 import com.android.carrent.utils.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
@@ -43,7 +48,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
     private var TAG: String = "HomeActivity"
-    private var typeOfSort: Int = 0
     // Is first attempt of location request
     private var isFirstAttempt = true
     // ViewModel
@@ -58,6 +62,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var mAuth: FirebaseAuth? = null
     // Widgets
     private lateinit var mMap: MapView
+    // Car
+    private var carList = mutableListOf<Car>()
+    private lateinit var carAdapter: CarAdapter
     // GoogleMap
     private lateinit var mGoogleMap: GoogleMap
 
@@ -87,6 +94,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
         // Init ViewModel
         viewModel = ViewModelProviders.of(activity!!).get(HomeFragmentViewModel::class.java)
+
+        // Layout for RecyclerView of Cars, getting all cars into mutable list
+        val layoutManager = LinearLayoutManager(activity)
+        layoutManager.orientation = RecyclerView.VERTICAL
+        v.rv_list.layoutManager = layoutManager
+
+        val divider = DividerItemDecoration(v.rv_list.context, DividerItemDecoration.VERTICAL)
+        divider.setDrawable(resources.getDrawable(R.drawable.car_item_divider))
+        v.rv_list.addItemDecoration(divider)
+
+        carList = viewModel.getAllCars()
+
 
         // Init user balance into toolbar
         initBalance()
@@ -177,9 +196,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                 startLocationUpdates()
             }
             if (mLocation != null) {
-
             } else {
-
             }
         } else requestLocationPermissions(LOCATION_PERMISSIONS_REQUEST)
 
@@ -213,11 +230,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     override fun onLocationChanged(p0: Location?) {
-        // Move camera to device location if it`s first attempt of location request
+        viewModel.sortCarList(carList, p0)
         if (isFirstAttempt) {
+            // Setting adapter for car recycler view, making recycler view visible
+            carAdapter = CarAdapter(carList, context!!, p0)
+            view?.rv_list?.adapter = carAdapter
+            viewModel.rvListHandlerOnLocationSuccess(view?.rv_list, view?.pb_rv_list)
+
+            // Move camera to device location if it`s first attempt of location request
             setCameraView(googleMap = mGoogleMap, location = p0)
             isFirstAttempt = false
         }
+        carAdapter.updateDeviceLocation(p0)
     }
 
     private fun requestLocationPermissions(requestCode: Int) {
@@ -250,46 +274,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         when (item.itemId) {
             R.id.btn_search -> {
             }
-            R.id.btn_sort -> {
-                view?.let {
-                    selectSortView(it)
-                }
-            }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-        var menuInflater: MenuInflater = activity!!.menuInflater
-        menuInflater.inflate(R.menu.home_sort_menu, menu)
-        var action_all: MenuItem = menu.findItem(R.id.action_all)
-        var action_nearest: MenuItem = menu.findItem(R.id.action_nearest)
-
-        if (typeOfSort == 1) {
-            action_all.setChecked(true)
-        } else if (typeOfSort == 2) {
-            action_nearest.setChecked(true)
-        }
-        super.onCreateContextMenu(menu, v, menuInfo)
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_all -> {
-                typeOfSort = 1
-                println("clicked on action all")
-            }
-            R.id.action_nearest -> {
-                typeOfSort = 2
-                println("clicked on action nearest")
-            }
-        }
-        return super.onContextItemSelected(item)
-    }
-
-    private fun selectSortView(v: View) {
-        registerForContextMenu(v)
-        activity?.openContextMenu(v)
     }
 
     private fun startMainActivity() {

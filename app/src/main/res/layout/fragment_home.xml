@@ -27,13 +27,28 @@
                     android:id="@+id/mapview"/>
         </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="50"
-                android:id="@+id/rv_list"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+              android:background="@color/colorPrimaryDark"/>
 
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     android:layout_width="match_parent"
+                     android:layout_height="0dp"
+                     android:layout_weight="50"
+                     android:background="@color/lightgray"
+                     android:id="@+id/rv_list_container">
 
+            <androidx.recyclerview.widget.RecyclerView
+                    android:visibility="invisible"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/rv_list"/>
+
+            <ProgressBar
+                    android:id="@+id/pb_rv_list"
+                    style="@style/progress_bar_dark"
+                    android:layout_gravity="center"/>
+
+        </FrameLayout>
     </LinearLayout>
 
 </RelativeLayout>
