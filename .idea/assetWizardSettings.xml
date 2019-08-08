@@ -82,7 +82,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_more_horiz_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_right_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -92,8 +92,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="f2f2f2" />
-                            <entry key="outputName" value="ic_more_horiz_black_24dp" />
+                            <entry key="color" value="aeaeae" />
+                            <entry key="outputName" value="ic_keyboard_arrow_right_gray_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\zitku" />
                           </map>

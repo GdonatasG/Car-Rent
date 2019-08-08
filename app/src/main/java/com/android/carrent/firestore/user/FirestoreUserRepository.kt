@@ -1,4 +1,4 @@
-package com.android.carrent.firestore
+package com.android.carrent.firestore.user
 
 import com.android.carrent.utils.Constants
 import com.google.firebase.firestore.DocumentReference

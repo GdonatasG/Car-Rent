@@ -12,6 +12,7 @@ object Constants {
 
     // Firestore
     val FIRESTORE_USERS_REFERENCE: String = "users"
+    val FIRESTORE_CARS_REFERENCE: String = "cars"
 
     // Location, location PERMISSIONS
     val PERMISSIONS = listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -26,17 +27,6 @@ object Constants {
     val LOCATION_PERMISSIONS_REQUEST = 1001
     val ERROR_DIALOG_REQUEST = 1003
     val GPS_REQUEST = 1004
-
-    // SplashFragment delay
-    val SPLASH_DELAY: Long = 3000
-
-    // Loading tips
-    val listOfLoadingTips = listOf(
-        R.string.tip1,
-        R.string.tip2,
-        R.string.tip3
-
-    )
 
     val MAPVIEW_BUNDLE_KEY = "MapViewBundleKey"
 
