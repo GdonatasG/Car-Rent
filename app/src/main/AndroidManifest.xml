@@ -31,11 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-                android:name=".activities.HomeActivity"
-                android:theme="@style/SplashThemeHome"
-                android:screenOrientation="portrait">
-        </activity>
 
         <meta-data
                 android:name="com.google.android.geo.API_KEY"

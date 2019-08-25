@@ -1,7 +1,6 @@
-package com.android.carrent.fragments.main
+package com.android.carrent.fragments.unlogged
 
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -11,11 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.carrent.R
-import com.android.carrent.activities.HomeActivity
+import com.android.carrent.activities.MainActivity
+import com.android.carrent.fragments.logged.HomeFragment.HomeFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
 import com.android.carrent.utils.extensions.*
+
+
 
 
 class LoginFragment : Fragment(), View.OnClickListener {
@@ -27,23 +29,19 @@ class LoginFragment : Fragment(), View.OnClickListener {
     // Firebase
     private var mAuth: FirebaseAuth? = null
 
-    // Fragments
-    private lateinit var registerFragment: RegisterFragment
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
 
-        // Init needed fragments
-        registerFragment = RegisterFragment()
-
+        (activity as MainActivity).disableWidgets()
 
         // If user is logged in, change fragment to SplashFragment
         mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting HomeActivity")
-            startHomeActivity()
+            Log.d(TAG, "User is already logged in, starting HomeFragment")
+            changeFragment(fragment = HomeFragment())
+            (activity as MainActivity).enabledWidgets()
         }
     }
 
@@ -75,7 +73,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             R.id.tv_goto_register -> {
                 Log.d(TAG, "Clicked on register textview")
                 if (!disabledWhileLogin) {
-                    changeFragment(registerFragment)
+                    changeFragment(fragment = RegisterFragment())
                 }
             }
 
@@ -108,8 +106,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
         mAuth?.signInWithEmailAndPassword(email, password)
             ?.addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d(TAG, "User logged in, starting SplashFragment")
-                    startHomeActivity()
+                    Log.d(TAG, "User logged in, starting HomeFragment")
+                    changeFragment(fragment = HomeFragment())
+                    (activity as MainActivity).enabledWidgets()
+
 
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
@@ -118,10 +118,5 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     hideProgressBar(progress_bar)
                 }
             }
-    }
-
-    private fun startHomeActivity() {
-        activity?.finish()
-        startActivity(Intent(activity, HomeActivity::class.java))
     }
 }

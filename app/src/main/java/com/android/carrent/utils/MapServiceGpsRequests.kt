@@ -9,7 +9,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import com.android.carrent.R
-import com.android.carrent.utils.Constants.GPS_REQUEST
+import com.android.carrent.utils.constants.Constants
+import com.android.carrent.utils.constants.Constants.GPS_REQUEST
 import com.android.carrent.utils.extensions.makeToast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability

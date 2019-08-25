@@ -5,12 +5,17 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import com.android.carrent.utils.Constants
+import android.util.Log
+import android.widget.Toast
+import com.android.carrent.R
+import com.android.carrent.utils.constants.Constants
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import java.io.IOException
 import java.util.*
+import kotlin.coroutines.experimental.coroutineContext
 
 fun setCameraView(googleMap: GoogleMap, location: Location?) {
     googleMap.moveCamera(
@@ -36,23 +41,29 @@ fun enableDeviceLocationWButton(googleMap: GoogleMap) {
     googleMap.uiSettings.isMyLocationButtonEnabled = true
 }
 
-fun getDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-    val latA = Math.toRadians(lat1)
-    val lonA = Math.toRadians(lon1)
+fun getDistance(lat1: Double?, lon1: Double?, lat2: Double?, lon2: Double?): Double {
+    val latA = Math.toRadians(lat1!!)
+    val lonA = Math.toRadians(lon1!!)
 
 
-    val latB = Math.toRadians(lat2)
-    val lonB = Math.toRadians(lon2)
+    val latB = Math.toRadians(lat2!!)
+    val lonB = Math.toRadians(lon2!!)
     val cosAng = Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA) + Math.sin(latA) * Math.sin(latB)
     val ang = Math.acos(cosAng)
     return ang * 6371
 }
 
-fun getAddress(lat: Double, lng: Double, context: Context): List<Address> {
-    val geocoder = Geocoder(context, Locale.getDefault())
-    val addresses: List<Address>
+fun getAddress(lat: Double, lng: Double, context: Context): Address {
+    Geocoder(context, Locale.getDefault())
+    var addresses: List<Address> = listOf(Address(Locale.getDefault()))
 
-    addresses = geocoder.getFromLocation(lat, lng, 1)
+    try {
+        addresses = Geocoder(context, Locale.getDefault()).getFromLocation(lat, lng, 1)
+    } catch (e: IOException) {
+        Toast.makeText(context, context.getText(R.string.address_error), Toast.LENGTH_SHORT).show()
+    }
 
-    return addresses
+    return addresses[0]
+
+
 }

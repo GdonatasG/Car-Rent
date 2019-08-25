@@ -10,7 +10,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
-import com.android.carrent.utils.Constants
+import com.android.carrent.utils.constants.Constants
 
 
 fun setLogoAndFormFadeIn(context: Context, iv_logo: ImageView, form: LinearLayout) {
@@ -37,12 +37,12 @@ fun showProgressBar(b: ProgressBar?) {
 }
 
 fun hideProgressBar(b: ProgressBar?) {
-    b?.visibility = View.GONE
+    b?.visibility = View.INVISIBLE
 }
 
 fun Fragment.changeFragment(fragment: Fragment) {
     activity?.supportFragmentManager
         ?.beginTransaction()
-        ?.replace(R.id.container, fragment)
+        ?.replace(R.id.container_host, fragment)
         ?.commitAllowingStateLoss()
 }

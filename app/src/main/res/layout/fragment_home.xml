@@ -4,7 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.home.HomeFragment.HomeFragment">
+        android:background="@color/lightgray"
+        tools:context=".fragments.logged.HomeFragment.HomeFragment">
 
     <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,7 +35,6 @@
                      android:layout_width="match_parent"
                      android:layout_height="0dp"
                      android:layout_weight="50"
-                     android:background="@color/lightgray"
                      android:id="@+id/rv_list_container">
 
             <androidx.recyclerview.widget.RecyclerView
