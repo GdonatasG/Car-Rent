@@ -32,8 +32,9 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
         holder.setData(car, position)
     }
 
-    fun updateDeviceLocation(deviceLocation: Location?) {
+    fun updateAdapter(list: MutableList<Car>, deviceLocation: Location? = null) {
         deviceLocation?.let { this.deviceLocation = it }
+        this.carList = list
         notifyDataSetChanged()
     }
 
@@ -43,12 +44,11 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
 
         fun setData(car: Car?, pos: Int) {
             car?.let {
-                itemView.tv_title.text = car.model.title
+                itemView.tv_title.text = it.model.title
 
-
-                setCarAddressCity(car.location!!.latitude, car.location!!.longitude)
-                setCarIconStatus(car.rent.rented)
-                setCarDistance(car.location)
+                setCarAddressCity(it.location!!.latitude, it.location!!.longitude)
+                setCarIconStatus(it.rent.rented)
+                setCarDistance(it.location)
             }
 
             this.currentCar = car
@@ -89,10 +89,11 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
         private fun setCarAddressCity(lat: Double, lng: Double) {
             itemView.tv_address.text =
                 getAddress(
-                    lat = lat,
-                    lng = lng,
-                    context = context
-                )[0].locality
+                lat = lat,
+                lng = lng,
+                context = context
+            ).locality
+
         }
 
     }

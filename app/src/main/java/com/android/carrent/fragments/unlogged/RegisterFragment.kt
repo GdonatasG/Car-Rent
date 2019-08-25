@@ -1,7 +1,6 @@
-package com.android.carrent.fragments.main
+package com.android.carrent.fragments.unlogged
 
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -11,9 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.carrent.R
-import com.android.carrent.activities.HomeActivity
+import com.android.carrent.activities.MainActivity
+import com.android.carrent.fragments.logged.HomeFragment.HomeFragment
 import com.android.carrent.models.User
-import com.android.carrent.utils.Constants
+import com.android.carrent.utils.constants.Constants
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,23 +29,19 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     // Firebase
     private var mAuth: FirebaseAuth? = null
 
-    // Fragments
-    private lateinit var loginFragment: LoginFragment
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
 
-        // Init needed fragments
-        loginFragment = LoginFragment()
-
+        (activity as MainActivity).disableWidgets()
 
         // If user is logged in, change fragment to SplashFragment
         mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting HomeActivity")
-            startHomeActivity()
+            Log.d(TAG, "User is already logged in, starting HomeFragment")
+            changeFragment(fragment = HomeFragment())
+            (activity as MainActivity).enabledWidgets()
         }
     }
 
@@ -72,7 +68,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             }
             R.id.tv_goto_login -> {
                 if (!disabledWhileRegister) {
-                    changeFragment(loginFragment)
+                    changeFragment(fragment = LoginFragment())
                 }
             }
         }
@@ -134,7 +130,8 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
                                 Log.d(TAG, "User added into firestore!")
-                                startHomeActivity()
+                                changeFragment(fragment = HomeFragment())
+                                (activity as MainActivity).enabledWidgets()
                             } else {
                                 makeToast(it.exception?.message.toString())
                                 hideProgressBar(progress_bar)
@@ -148,10 +145,5 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 }
             }
 
-    }
-
-    private fun startHomeActivity() {
-        activity?.finish()
-        startActivity(Intent(activity, HomeActivity::class.java))
     }
 }

@@ -1,4 +1,4 @@
-package com.android.carrent.fragments.home
+package com.android.carrent.fragments.logged
 
 
 import android.os.Bundle
@@ -9,7 +9,7 @@ import android.view.ViewGroup
 
 import com.android.carrent.R
 
-class ProfileFragment : Fragment() {
+class RentedFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +20,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var v: View = inflater.inflate(R.layout.fragment_profile, container, false)
+        var v: View = inflater.inflate(R.layout.fragment_rented, container, false)
         return v
     }
 }

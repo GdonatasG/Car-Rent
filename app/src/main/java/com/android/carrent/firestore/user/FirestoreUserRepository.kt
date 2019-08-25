@@ -1,6 +1,6 @@
 package com.android.carrent.firestore.user
 
-import com.android.carrent.utils.Constants
+import com.android.carrent.utils.constants.Constants
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 

@@ -13,6 +13,8 @@
     <string name="permissions_error">Can`t get your location</string>
     <string name="logout_press_again">Click again to confirm logout.</string>
     <string name="maps_error">Error: can`t make map requests.</string>
+    <string name="address_error">Can`t get addresses. Restart your device</string>
+    <string name="filter_dialog_title">Filter cars</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>
@@ -20,13 +22,7 @@
     <string name="hint_password">Enter password</string>
     <string name="hint_confirm_password">Confirm password</string>
     <string name="hint_phone_number">Enter phone number</string>
-
-    <!-- Loading tips -->
-    <string name="loading_tip_prefix">Quick tip:</string>
-
-    <string name="tip1">Search refreshes not only list, but map markers too.</string>
-    <string name="tip2">You can search by car plate number, geolocation, address and by more other details.</string>
-    <string name="tip3">Use sorting to find nearest cars.</string>
+    <string name="searchview_hint">Model, plate number, city or street</string>
 
     <!-- Navigation drawer, other menus -->
     <string name="title_activity_home">HomeActivity</string>

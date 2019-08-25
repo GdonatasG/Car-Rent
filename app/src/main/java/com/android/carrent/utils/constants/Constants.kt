@@ -1,7 +1,6 @@
-package com.android.carrent.utils
+package com.android.carrent.utils.constants
 
 import android.Manifest
-import com.android.carrent.R
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 

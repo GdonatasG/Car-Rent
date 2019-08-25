@@ -18,7 +18,7 @@
             android:textColor="@color/orange"
             android:fontFamily="monospace"
             android:textSize="14sp"
-            android:text="/? km"/>
+            android:text="@string/distance_value"/>
 
     <TextView
             android:id="@+id/tv_title"
@@ -36,7 +36,7 @@
             android:fontFamily="monospace"
             android:textStyle="bold"
             android:textSize="14sp"
-            tools:text="Opel Vectra"/>
+            tools:text="Car"/>
 
     <TextView
             android:id="@+id/tv_address"
@@ -51,7 +51,7 @@
             android:textColor="@color/colorPrimaryDark"
             android:fontFamily="monospace"
             android:textSize="12sp"
-            tools:text="V. Kreves pr. 57, Kaunas"
+            tools:text="Address"
             android:textStyle="italic"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
