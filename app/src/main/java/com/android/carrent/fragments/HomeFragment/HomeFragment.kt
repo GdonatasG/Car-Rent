@@ -1,4 +1,4 @@
-package com.android.carrent.fragments.logged.HomeFragment
+package com.android.carrent.fragments.HomeFragment
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -9,9 +9,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -24,11 +22,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.android.carrent.R
+import com.android.carrent.activities.MainActivity
 import com.android.carrent.adapters.CarAdapter
 import com.android.carrent.firestore.car.CarListCallback
-import com.android.carrent.fragments.unlogged.LoginFragment
 import com.android.carrent.models.Car.Car
-import com.android.carrent.models.ClusterMarker
 import com.android.carrent.utils.*
 import com.android.carrent.utils.constants.Constants.FASTEST_INTERVAL
 import com.android.carrent.utils.constants.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
@@ -45,10 +42,8 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.firebase.auth.FirebaseAuth
-import com.google.maps.android.clustering.ClusterManager
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
 @Suppress("DEPRECATION")
@@ -80,21 +75,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var modifiedCarList = mutableListOf<Car>()
     // GoogleMap
     private lateinit var mGoogleMap: GoogleMap
-    private lateinit var mClusterManager: ClusterManager<ClusterMarker>
-    private lateinit var mClusterManagerRenderer: ClusterManagerRenderer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
-
-        if (mAuth?.currentUser == null) {
-            Log.d(TAG, "User is not logged in, starting LoginFragment")
-            changeFragment(fragment = LoginFragment())
-        }
-
-
     }
 
     override fun onCreateView(
@@ -103,6 +89,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     ): View? {
         // Inflate the layout for this fragment
         val v: View = inflater.inflate(R.layout.fragment_home, container, false)
+
+        // Enable needed widgets
+        (activity as MainActivity).enabledWidgets()
 
         // toolbar
         setHasOptionsMenu(true)
@@ -124,10 +113,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         // Init user balance into toolbar
         initBalance()
 
+
         // map init, location updates
         mMap = v.mapview
         initMap(savedInstanceState)
-
         configureGoogleApiClient()
         mLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         mMapServiceGpsRequests = MapServiceGpsRequests(activity!!)
@@ -138,10 +127,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     private fun initBalance() {
-        viewModel.getUser(mAuth!!.uid.toString()).observe(this, Observer { it ->
+        // If user IS NOT logged in, let him know that his status is guest
+        // If user IS logged in, init balance
+        if (mAuth?.currentUser == null) {
+            (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.nav_header_guest)
+        } else viewModel.getUser(mAuth!!.uid.toString()).observe(this, Observer { it ->
             (activity as AppCompatActivity).supportActionBar?.title = it.balance.toString() + " " +
                     resources.getText(R.string.nav_header_currency_euro)
         })
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -283,7 +277,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                     // Setting adapter for car recycler view
                     carAdapter = CarAdapter(carList, context!!, p0)
                     view?.rv_list?.adapter = carAdapter
-                    addMarkers(carList)
+                    viewModel.addMapMarkers(map = mGoogleMap, list = carList, context = activity?.applicationContext)
 
                     setCameraView(googleMap = mGoogleMap, location = p0)
                     isFirstAttempt = false
@@ -294,10 +288,18 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                 else {
                     if (modifiedCarList.isNotEmpty() || isListFiltered) {
                         carAdapter.updateAdapter(modifiedCarList, p0)
-                        addMarkers(modifiedCarList)
+                        viewModel.addMapMarkers(
+                            map = mGoogleMap,
+                            list = modifiedCarList,
+                            context = activity?.applicationContext
+                        )
                     } else {
                         carAdapter.updateAdapter(carList, p0)
-                        addMarkers(carList)
+                        viewModel.addMapMarkers(
+                            map = mGoogleMap,
+                            list = carList,
+                            context = activity?.applicationContext
+                        )
                     }
                 }
                 // Make RecyclerView visible and progressBar - not visible
@@ -327,34 +329,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             else -> {
                 // Ignore all other requests.
             }
-        }
-    }
-
-    private fun addMarkers(list: MutableList<Car>) {
-        mGoogleMap.let {
-            mClusterManager = ClusterManager(activity?.applicationContext, mGoogleMap)
-
-            mClusterManagerRenderer = ClusterManagerRenderer(activity, mGoogleMap, mClusterManager)
-
-            mClusterManager.renderer = mClusterManagerRenderer
-
-            mClusterManager.clearItems()
-            mGoogleMap.clear()
-
-            for (c in list) {
-                val title: String? = c.model.title
-                // Snippet is id of car, because I want to start DetailFragment when marker will be clicked.
-                val snippet: String? = c.id.toString()
-
-                val icon =
-                    if (c.rent.rented!!) R.drawable.ic_directions_car_rented_24dp else R.drawable.ic_directions_car_free_24dp
-
-                val marker =
-                    ClusterMarker(snippet!!, title!!, LatLng(c.location!!.latitude, c.location!!.longitude), icon)
-                mClusterManager.addItem(marker)
-            }
-            mClusterManager.cluster()
-
         }
     }
 
@@ -389,7 +363,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         searchView.clearFocus()
         searchView.setIconifiedByDefault(false)
         val icon: ImageView = searchView.findViewById(androidx.appcompat.R.id.search_mag_icon) as ImageView
-        icon.layoutParams = LinearLayout.LayoutParams(0, 0)
+        icon.layoutParams = LinearLayout.LayoutParams(0, 0) as ViewGroup.LayoutParams?
 
         val editText = searchView.findViewById<SearchView>(androidx.appcompat.R.id.search_src_text) as EditText
         editText.hint = getText(R.string.searchview_hint)
@@ -432,7 +406,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                     context = context!!
                 )
             )
-            addMarkers(modifiedCarList)
+            viewModel.addMapMarkers(map = mGoogleMap, list = modifiedCarList, context = activity?.applicationContext)
 
         }
 

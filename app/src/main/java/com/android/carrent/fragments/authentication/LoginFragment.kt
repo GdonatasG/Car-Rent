@@ -1,4 +1,4 @@
-package com.android.carrent.fragments.unlogged
+package com.android.carrent.fragments.authentication
 
 
 import android.os.Bundle
@@ -11,13 +11,11 @@ import android.view.ViewGroup
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
-import com.android.carrent.fragments.logged.HomeFragment.HomeFragment
+import com.android.carrent.fragments.HomeFragment.HomeFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
 import com.android.carrent.utils.extensions.*
-
-
 
 
 class LoginFragment : Fragment(), View.OnClickListener {
@@ -35,14 +33,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
         // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
 
+        // Disable widgets
         (activity as MainActivity).disableWidgets()
-
-        // If user is logged in, change fragment to SplashFragment
-        mAuth?.currentUser?.let {
-            Log.d(TAG, "User is already logged in, starting HomeFragment")
-            changeFragment(fragment = HomeFragment())
-            (activity as MainActivity).enabledWidgets()
-        }
     }
 
     override fun onCreateView(
@@ -56,6 +48,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
         v.btn_login.setOnClickListener(this)
 
+        v.tv_continue_as_guest.setOnClickListener(this)
+
         v.tv_goto_register.setOnClickListener(this)
 
         v.tv_forgot_password.setOnClickListener(this)
@@ -68,6 +62,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
             R.id.btn_login -> {
                 Log.d(TAG, "Clicked on login button")
                 if (!disabledWhileLogin) doValidations()
+            }
+
+            R.id.tv_continue_as_guest -> {
+                changeFragment(fragment = HomeFragment())
             }
 
             R.id.tv_goto_register -> {
@@ -108,9 +106,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
                 if (it.isSuccessful) {
                     Log.d(TAG, "User logged in, starting HomeFragment")
                     changeFragment(fragment = HomeFragment())
-                    (activity as MainActivity).enabledWidgets()
-
-
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
                     makeToast(it.exception?.message.toString())

@@ -1,7 +1,5 @@
 package com.android.carrent.models
 
-import android.graphics.drawable.Drawable
-import com.android.carrent.models.Car.Car
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 

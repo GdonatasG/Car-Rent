@@ -1,7 +1,6 @@
 package com.android.carrent.utils
 
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.ImageView
 import com.android.carrent.models.ClusterMarker
 import com.google.android.gms.maps.GoogleMap

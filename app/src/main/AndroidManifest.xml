@@ -32,6 +32,14 @@
             </intent-filter>
         </activity>
 
+        <receiver
+                android:name=".utils.ConnectivityReceiver"
+                android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/maps_api"/>

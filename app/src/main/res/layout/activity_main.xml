@@ -1,33 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".activities.MainActivity">
-
-    <include
-            layout="@layout/toolbar"
-            android:id="@+id/toolbar"/>
-
-    <FrameLayout
-            android:id="@+id/container_host"
+        android:layout_height="match_parent">
+    <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"
-            android:layout_above="@id/bottom_navigation"/>
+            tools:context=".activities.MainActivity">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            app:menu="@menu/navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            app:itemTextColor="@color/bottom_nav_color"
-            app:itemIconTint="@color/bottom_nav_color"
-            android:layout_alignParentBottom="true"
-            app:itemIconSize="26dp"
-            app:labelVisibilityMode="unlabeled"/>
+        <include
+                layout="@layout/toolbar"
+                android:id="@+id/toolbar"/>
 
-</RelativeLayout>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/toolbar"
+                android:layout_above="@id/bottom_navigation">
+
+            <FrameLayout
+                    android:id="@+id/container_host"
+                    android:layout_above="@id/connectivitySnack"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+            </FrameLayout>
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:id="@+id/connectivitySnack"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation"
+                app:menu="@menu/navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryDark"
+                app:itemTextColor="@color/bottom_nav_color"
+                app:itemIconTint="@color/bottom_nav_color"
+                android:layout_alignParentBottom="true"
+                app:itemIconSize="26dp"
+                app:labelVisibilityMode="unlabeled"/>
+
+    </RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
