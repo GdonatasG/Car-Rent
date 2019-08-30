@@ -2,12 +2,10 @@
 <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/fragment_login"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/colorPrimaryDark"
-        tools:context=".fragments.unlogged.LoginFragment"
+        tools:context=".fragments.authentication.LoginFragment"
         android:fillViewport="true"
         android:paddingTop="12dp"
         android:paddingBottom="15dp"
@@ -71,6 +69,14 @@
                     android:layout_margin="@dimen/second_options_layout_margin">
 
                 <TextView
+                        android:id="@+id/tv_continue_as_guest"
+                        style="@style/TextSecondOptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/continue_as_guest"/>
+
+                <TextView
                         android:id="@+id/tv_goto_register"
                         style="@style/TextSecondOptions"
                         android:layout_width="wrap_content"
@@ -94,103 +100,3 @@
 
 
 </ScrollView>
-        <!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    tools:context=".fragments.main.LoginFragment"
-                    android:fillViewport="true"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="15dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:scrollbarStyle="outsideOverlay" tools:ignore="MissingDefaultResource">
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                <ImageView
-                        android:id="@+id/iv_logo"
-                        style="@style/iv_logo"/>
-
-                <LinearLayout
-                        android:id="@+id/login_form"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:focusable="false"
-                        android:focusableInTouchMode="true">
-
-                    <TextView
-                            style="@style/TextPrimaryBold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/login"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_margin="20dp"/>
-
-                    <EditText
-                            android:id="@+id/et_email"
-                            style="@style/EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/hint_email"
-                            android:inputType="textEmailAddress"/>
-
-                    <EditText
-                            android:id="@+id/et_password"
-                            style="@style/EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/hint_password"
-                            android:inputType="textPassword"/>
-
-                    <ProgressBar
-                            android:id="@+id/progress_bar"
-                            style="@style/progress_bar"/>
-
-                    <Button
-                            android:id="@+id/btn_login"
-                            style="@style/button"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/login"/>
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_margin="10dp"
-                            android:weightSum="2">
-
-                        <TextView
-                                android:id="@+id/tv_goto_register"
-                                style="@style/TextSecondaryItalic"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingRight="10dp"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="@string/not_registered"/>
-
-                        <TextView
-                                android:id="@+id/tv_forgot_password"
-                                style="@style/TextSecondaryItalic"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingLeft="10dp"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="@string/forgot_password"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </ScrollView>-->

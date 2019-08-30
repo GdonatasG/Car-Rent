@@ -1,4 +1,4 @@
-package com.android.carrent.fragments.logged.HomeFragment
+package com.android.carrent.fragments.HomeFragment
 
 import android.content.Context
 import android.location.Location
@@ -9,20 +9,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
+import com.android.carrent.R
 import com.android.carrent.firestore.car.CarListCallback
 import com.android.carrent.firestore.car.FirestoreCarRepository
 import com.android.carrent.firestore.user.FirestoreUserRepository
 import com.android.carrent.models.Car.Car
+import com.android.carrent.models.ClusterMarker
 import com.android.carrent.models.User
+import com.android.carrent.utils.ClusterManagerRenderer
 import com.android.carrent.utils.constants.FilterConstants
 import com.android.carrent.utils.extensions.getAddress
 import com.android.carrent.utils.extensions.getDistance
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterManager
 
 class HomeFragmentViewModel : ViewModel() {
     private val TAG: String = "HomeFragmentViewModel"
     private var userRepository = FirestoreUserRepository()
     private var carRepository = FirestoreCarRepository()
     private var user: MutableLiveData<User> = MutableLiveData()
+
+    // Marker clustering
+    private lateinit var mClusterManager: ClusterManager<ClusterMarker>
+    private lateinit var mClusterManagerRenderer: ClusterManagerRenderer
 
     fun getUser(uid: String): LiveData<User> {
         userRepository.getUser(uid)
@@ -140,6 +150,34 @@ class HomeFragmentViewModel : ViewModel() {
         }
 
         return modifiedCarList
+    }
+
+    fun addMapMarkers(map: GoogleMap, list: MutableList<Car>, context: Context?){
+        map.let {
+            mClusterManager = ClusterManager(context, map)
+
+            mClusterManagerRenderer = ClusterManagerRenderer(context, map, mClusterManager)
+
+            mClusterManager.renderer = mClusterManagerRenderer
+
+            mClusterManager.clearItems()
+            map.clear()
+
+            for (c in list) {
+                val title: String? = c.model.title
+                // Snippet is id of car, because I want to start DetailFragment when marker will be clicked.
+                val snippet: String? = c.id.toString()
+
+                val icon =
+                    if (c.rent.rented!!) R.drawable.ic_directions_car_rented_24dp else R.drawable.ic_directions_car_free_24dp
+
+                val marker =
+                    ClusterMarker(snippet!!, title!!, LatLng(c.location!!.latitude, c.location!!.longitude), icon)
+                mClusterManager.addItem(marker)
+            }
+            mClusterManager.cluster()
+
+        }
     }
 
     fun sortCarList(list: MutableList<Car>, deviceLocation: Location?) {

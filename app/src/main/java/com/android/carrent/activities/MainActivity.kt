@@ -1,27 +1,34 @@
 package com.android.carrent.activities
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
-import com.android.carrent.fragments.logged.HomeFragment.HomeFragment
-import com.android.carrent.fragments.logged.ProfileFragment
-import com.android.carrent.fragments.logged.RentedFragment
-import com.android.carrent.fragments.unlogged.LoginFragment
+import com.android.carrent.fragments.HomeFragment.HomeFragment
+import com.android.carrent.fragments.ProfileFragment
+import com.android.carrent.fragments.RentedFragment
+import com.android.carrent.fragments.authentication.LoginFragment
+import com.android.carrent.utils.ConnectivityReceiver
 import com.android.carrent.utils.MapServiceGpsRequests
+import com.android.carrent.utils.extensions.mainSnackbarView
 import com.android.carrent.utils.extensions.makeToast
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityReceiverListener {
+
     private var TAG: String = "MainActivity"
     private var backPressedTime: Long = 0
+    private var snackbar: Snackbar? = null
 
     // Firebase
     private var mAuth: FirebaseAuth? = null
@@ -35,6 +42,9 @@ class MainActivity : AppCompatActivity() {
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
+        // Init internet connectio receiver
+        registerReceiver(ConnectivityReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
 
@@ -46,16 +56,11 @@ class MainActivity : AppCompatActivity() {
 
         bottom_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        if (mAuth?.currentUser == null) {
-            Log.d(TAG, "User is not logged in, starting LoginFragment")
-            setFragment(fragment = LoginFragment())
+        if (savedInstanceState == null && mMapServiceGpsRequests.isServicesOk()) {
+            setFragment(fragment = HomeFragment())
         } else {
-            if (savedInstanceState == null && mMapServiceGpsRequests.isServicesOk()) {
-                setFragment(fragment = HomeFragment())
-                enabledWidgets()
-            }
+            setFragment(fragment = LoginFragment())
         }
-
 
     }
 
@@ -65,35 +70,42 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Clicked on BottomNavigation home_main_menu item")
                 if (mMapServiceGpsRequests.isServicesOk()) {
                     setFragment(fragment = HomeFragment())
-                    enabledWidgets()
                     return@OnNavigationItemSelectedListener true
+                } else {
+                    setFragment(fragment = LoginFragment())
                 }
 
             }
             R.id.navigation_profile -> {
                 Log.d(TAG, "Clicked on BottomNavigation profile item")
-                supportActionBar?.title = "My Profile"
-                setFragment(fragment = ProfileFragment())
-                enabledWidgets()
-                return@OnNavigationItemSelectedListener true
+                if (mAuth?.currentUser != null) {
+                    supportActionBar?.title = "My Profile"
+                    setFragment(fragment = ProfileFragment())
+                    return@OnNavigationItemSelectedListener true
+                } else setFragment(fragment = LoginFragment())
+
             }
             R.id.navigation_rented -> {
                 Log.d(TAG, "Clicked on BottomNavigation rented item")
-                supportActionBar?.title = "My Car"
-                setFragment(fragment = RentedFragment())
-                enabledWidgets()
-                return@OnNavigationItemSelectedListener true
+                if (mAuth?.currentUser != null) {
+                    supportActionBar?.title = "My Car"
+                    setFragment(fragment = RentedFragment())
+                    return@OnNavigationItemSelectedListener true
+                } else setFragment(fragment = LoginFragment())
             }
             R.id.navigation_logout -> {
                 Log.d(TAG, "Clicked on BottomNavigation logout item")
-                if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                    mAuth?.signOut()
-                    setFragment(fragment = LoginFragment())
-                } else {
-                    makeToast(resources.getString(R.string.logout_press_again))
+                if (mAuth?.currentUser != null) {
+                    if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                        mAuth?.signOut()
+                        setFragment(fragment = LoginFragment())
+                    } else {
+                        makeToast(resources.getString(R.string.logout_press_again))
+                    }
+
+                    backPressedTime = System.currentTimeMillis()
                 }
 
-                backPressedTime = System.currentTimeMillis()
 
                 // Return false, because no reason to select this item, it`s only logout button
                 return@OnNavigationItemSelectedListener false
@@ -101,6 +113,25 @@ class MainActivity : AppCompatActivity() {
 
         }
         false
+    }
+
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        showNetworkMessage(isConnected)
+    }
+
+    private fun showNetworkMessage(isConnected: Boolean) {
+        if (!isConnected) {
+            snackbar = Snackbar.make(
+                connectivitySnack,
+                getText(R.string.error_no_internet),
+                Snackbar.LENGTH_LONG
+            )
+            snackbar?.duration = BaseTransientBottomBar.LENGTH_INDEFINITE
+            mainSnackbarView(snackbar = snackbar)
+            if (!snackbar!!.isShown) snackbar?.show()
+        } else {
+            snackbar?.dismiss()
+        }
     }
 
     fun enabledWidgets() {
@@ -125,5 +156,10 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.container_host, fragment)
             .commitAllowingStateLoss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ConnectivityReceiver.connectivityReceiverListener = this
     }
 }

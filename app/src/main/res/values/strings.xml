@@ -6,6 +6,7 @@
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="already_registered">I have an account</string>
+    <string name="continue_as_guest">Continue as guest</string>
     <string name="create_account">Create account</string>
     <string name="forgot_password">Forgot password</string>
     <string name="enter_valid_email">Enter valid email</string>
@@ -14,6 +15,7 @@
     <string name="logout_press_again">Click again to confirm logout.</string>
     <string name="maps_error">Error: can`t make map requests.</string>
     <string name="address_error">Can`t get addresses. Restart your device</string>
+    <string name="error_no_internet">No internet connection!</string>
     <string name="filter_dialog_title">Filter cars</string>
 
     <!--EditText Hints-->
@@ -31,6 +33,7 @@
     <string name="nav_header_welcome">Welcome,</string>
     <string name="nav_header_balance">69 €</string>
     <string name="nav_header_currency_euro">€</string>
+    <string name="nav_header_guest">Guest</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
