@@ -44,11 +44,12 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.Marker
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
 @Suppress("DEPRECATION")
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
     private var TAG: String = "MainActivity"
     // Is first attempt of location request
@@ -75,6 +76,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var modifiedCarList = mutableListOf<Car>()
     // GoogleMap
     private lateinit var mGoogleMap: GoogleMap
+    // Weight animations
+    private lateinit var mLayoutWeightAnimations: LayoutWeightAnimations
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,6 +112,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         divider.setDrawable(resources.getDrawable(R.drawable.car_item_divider))
         v.rv_list.addItemDecoration(divider)
 
+        // Layout weight animations/manipulations
+        mLayoutWeightAnimations =
+            LayoutWeightAnimations(mapView = v.map_container, recyclerView = v.rv_list_container, context = context!!)
+        v.btn_full_screen_map.setOnClickListener(this)
 
         // Init user balance into toolbar
         initBalance()
@@ -427,6 +434,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         dialog.show()
 
     }
+
+    override fun onClick(v: View?) {
+        when (v) {
+            btn_full_screen_map -> {
+                if (mLayoutWeightAnimations.mMapLayoutState == mLayoutWeightAnimations.MAP_LAYOUT_STATE_CONTRACTED) {
+                    mLayoutWeightAnimations.mMapLayoutState = mLayoutWeightAnimations.MAP_LAYOUT_STATE_EXPANDED
+                    mLayoutWeightAnimations.expandMapAnimation()
+                } else if (mLayoutWeightAnimations.mMapLayoutState == mLayoutWeightAnimations.MAP_LAYOUT_STATE_EXPANDED) {
+                    mLayoutWeightAnimations.mMapLayoutState = mLayoutWeightAnimations.MAP_LAYOUT_STATE_CONTRACTED
+                    mLayoutWeightAnimations.contractMapAnimation()
+                }
+            }
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
