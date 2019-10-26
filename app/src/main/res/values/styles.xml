@@ -105,11 +105,89 @@
 
     </style>
 
+    <style name="layout_divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="layout_divider_light" parent="@style/layout_divider">
+        <item name="android:background">@android:color/darker_gray</item>
+    </style>
+
+    <style name="preference_title">
+        <item name="android:textColor">@color/orange</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="preference_summary">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="profile_balance">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="profile_action_item">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
     <style name="ToolbarTitleFont">
         <item name="android:fontFamily">monospace</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <!-- CardView item-->
+
+    <style name="cardview">
+        <item name="android:clickable">true</item>
+        <item name="android:layout_width">@dimen/cardview_width</item>
+        <item name="android:layout_height">@dimen/cardview_height</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+    <style name="cardview_image">
+        <item name="android:layout_width">@dimen/cardview_image_width</item>
+        <item name="android:layout_height">@dimen/cardview_image_height</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="cardview_title">
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="cardview_subtitle">
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="cardview_divider" parent="@style/layout_divider">
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:layout_marginBottom">7dp</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+    </style>
+
+    <style name="cardview_layout_bg">
+        <item name="android:background">@color/lightgray</item>
+    </style>
+
 
 </resources>

@@ -46,7 +46,7 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
             car?.let {
                 itemView.tv_title.text = it.model.title
 
-                setCarAddressCity(it.location!!.latitude, it.location!!.longitude)
+                //setCarAddressCity(it.location!!.latitude, it.location!!.longitude)
                 setCarIconStatus(it.rent.rented)
                 setCarDistance(it.location)
             }

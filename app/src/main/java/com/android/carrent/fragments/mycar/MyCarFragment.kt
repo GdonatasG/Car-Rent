@@ -1,4 +1,4 @@
-package com.android.carrent.fragments
+package com.android.carrent.fragments.mycar
 
 
 import android.os.Bundle
@@ -11,7 +11,7 @@ import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 
-class ProfileFragment : Fragment() {
+class MyCarFragment : Fragment() {
     // Firebase
     private var mAuth: FirebaseAuth? = null
 
@@ -25,7 +25,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var v: View = inflater.inflate(R.layout.fragment_profile, container, false)
+        val v: View = inflater.inflate(R.layout.fragment_rented, container, false)
 
         // Enable needed widgets
         (activity as MainActivity).enabledWidgets()

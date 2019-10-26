@@ -32,10 +32,28 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_welcome">Welcome,</string>
     <string name="nav_header_balance">69 €</string>
+    <string name="balance">Balance: 69 €</string>
     <string name="nav_header_currency_euro">€</string>
     <string name="nav_header_guest">Guest</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Profile preferences -->
+    <string name="KEY_MY_CAR">MY_CAR</string>
+    <string name="my_car_title">My car</string>
+    <string name="my_car_summary">View your car in details</string>
+
+    <string name="KEY_EDIT_PROFILE">EDIT_PROFILE</string>
+    <string name="edit_profile_title">Edit your profile</string>
+    <string name="edit_profile_summary">Change username, phone number</string>
+
+    <string name="KEY_CHANGE_PASSWORD">CHANGE_PASSWORD</string>
+    <string name="change_password_title">Change password</string>
+    <string name="change_password_summary">Change your password</string>
+
+    <string name="KEY_LOGOUT">LOGOUT</string>
+    <string name="logout_title">Logout</string>
+    <string name="logout_summary">Logout from your current account</string>
 
     <!-- Toolbar -->
     <string name="show_all">Show all</string>

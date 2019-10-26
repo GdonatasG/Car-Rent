@@ -25,8 +25,11 @@ import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.adapters.CarAdapter
 import com.android.carrent.firestore.car.CarListCallback
+import com.android.carrent.fragments.authentication.LoginFragment
+import com.android.carrent.fragments.profile.ProfileFragment
 import com.android.carrent.models.Car.Car
 import com.android.carrent.utils.*
+import com.android.carrent.utils.constants.Constants.BACKSTACK_HOME
 import com.android.carrent.utils.constants.Constants.FASTEST_INTERVAL
 import com.android.carrent.utils.constants.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
 import com.android.carrent.utils.constants.Constants.LOCATION_PERMISSIONS_REQUEST
@@ -117,9 +120,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             LayoutWeightAnimations(mapView = v.map_container, recyclerView = v.rv_list_container, context = context!!)
         v.btn_full_screen_map.setOnClickListener(this)
 
-        // Init user balance into toolbar
-        initBalance()
-
 
         // map init, location updates
         mMap = v.mapview
@@ -131,18 +131,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         mMapServiceGpsRequests.checkLocation()
 
         return v
-    }
-
-    private fun initBalance() {
-        // If user IS NOT logged in, let him know that his status is guest
-        // If user IS logged in, init balance
-        if (mAuth?.currentUser == null) {
-            (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.nav_header_guest)
-        } else viewModel.getUser(mAuth!!.uid.toString()).observe(this, Observer { it ->
-            (activity as AppCompatActivity).supportActionBar?.title = it.balance.toString() + " " +
-                    resources.getText(R.string.nav_header_currency_euro)
-        })
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -261,8 +249,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                     modifiedCarList = modifiedCarList
                 )
 
-                // Sorting used list
-                if (modifiedCarList.isNotEmpty() || isListFiltered) {
+                // Checking which list is used:
+                // * If modified list is used, then updating this list, setting adapter and map markers
+                // * If modified list is not used, then updating default carList, setting adapter and map markers
+                if (modifiedCarList.isNotEmpty() || isListFiltered) { // modified list used
                     modifiedCarList = viewModel.filterList(
                         modifiedCarList = modifiedCarList,
                         carList = carList,
@@ -271,44 +261,32 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
                         context = context!!
                     )
                     viewModel.sortCarList(modifiedCarList, p0)
+                    carAdapter = CarAdapter(modifiedCarList, context!!, p0)
+                    view?.rv_list?.adapter = carAdapter
+                    viewModel.addMapMarkers(
+                        map = mGoogleMap,
+                        list = modifiedCarList,
+                        context = activity?.applicationContext
+                    )
+                } else { // modified list is not used
+                    viewModel.sortCarList(carList, p0)
+                    carAdapter = CarAdapter(carList, context!!, p0)
+                    view?.rv_list?.adapter = carAdapter
+                    viewModel.addMapMarkers(
+                        map = mGoogleMap,
+                        list = carList,
+                        context = activity?.applicationContext
+                    )
                 }
-                viewModel.sortCarList(carList, p0)
 
-                // If IT`S first attempt of getting carList:
-                // * Setting up adapter
-                // * Attaching that adapter to RecyclerView
-                // * Adding markers
+                // If IT`S first time attempting location:
                 // * Move camera to device location
                 // * Let code to know that second time will not be first time
                 if (isFirstAttempt) {
-                    // Setting adapter for car recycler view
-                    carAdapter = CarAdapter(carList, context!!, p0)
-                    view?.rv_list?.adapter = carAdapter
-                    viewModel.addMapMarkers(map = mGoogleMap, list = carList, context = activity?.applicationContext)
-
                     setCameraView(googleMap = mGoogleMap, location = p0)
                     isFirstAttempt = false
                 }
-                // If IT`S NOT first attempt of getting carList:
-                // * Checking which list should be used for adapter
-                // * Adding markers
-                else {
-                    if (modifiedCarList.isNotEmpty() || isListFiltered) {
-                        carAdapter.updateAdapter(modifiedCarList, p0)
-                        viewModel.addMapMarkers(
-                            map = mGoogleMap,
-                            list = modifiedCarList,
-                            context = activity?.applicationContext
-                        )
-                    } else {
-                        carAdapter.updateAdapter(carList, p0)
-                        viewModel.addMapMarkers(
-                            map = mGoogleMap,
-                            list = carList,
-                            context = activity?.applicationContext
-                        )
-                    }
-                }
+
                 // Make RecyclerView visible and progressBar - not visible
                 viewModel.rvListHandlerOnLocationSuccess(view?.rv_list, view?.pb_rv_list)
 
@@ -349,6 +327,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         when (item.itemId) {
             R.id.btn_filtering -> {
                 performFiltering()
+            }
+
+            R.id.btn_profile -> {
+                if (mAuth?.currentUser == null) changeFragment(R.id.container_host, LoginFragment())
+                else changeFragmentWithBackStack(
+                    view = R.id.container_host,
+                    fragment = ProfileFragment(),
+                    tag = BACKSTACK_HOME
+                )
             }
         }
         return super.onOptionsItemSelected(item)
@@ -453,6 +440,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     override fun onResume() {
         super.onResume()
         mMap.onResume()
+        // to handle camera view when backstacking
+        isFirstAttempt = true
     }
 
     override fun onStart() {

@@ -67,12 +67,12 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.tv_continue_as_guest -> {
-                changeFragment(fragment = HomeFragment())
+                changeFragment(R.id.container_host, fragment = HomeFragment())
             }
 
             R.id.tv_goto_login -> {
                 if (!disabledWhileRegister) {
-                    changeFragment(fragment = LoginFragment())
+                    changeFragment(R.id.container_host, fragment = LoginFragment())
                 }
             }
         }
@@ -134,7 +134,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                         .addOnCompleteListener {
                             if (it.isSuccessful) {
                                 Log.d(TAG, "User added into firestore!")
-                                changeFragment(fragment = HomeFragment())
+                                changeFragment(R.id.container_host, fragment = HomeFragment())
                             } else {
                                 makeToast(it.exception?.message.toString())
                                 hideProgressBar(progress_bar)

@@ -1,4 +1,4 @@
-package com.android.carrent.fragments
+package com.android.carrent.fragments.profile
 
 
 import android.os.Bundle
@@ -9,9 +9,11 @@ import android.view.ViewGroup
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
+import com.android.carrent.utils.extensions.changeFragment
+import com.android.carrent.utils.extensions.shouldShowHomeButton
 import com.google.firebase.auth.FirebaseAuth
 
-class RentedFragment : Fragment() {
+class ProfileFragment : Fragment() {
     // Firebase
     private var mAuth: FirebaseAuth? = null
 
@@ -25,11 +27,22 @@ class RentedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var v: View = inflater.inflate(R.layout.fragment_rented, container, false)
+        val v: View? = inflater.inflate(R.layout.fragment_profile, container, false)
 
         // Enable needed widgets
         (activity as MainActivity).enabledWidgets()
 
+        setHasOptionsMenu(true)
+        shouldShowHomeButton(activity, true)
+
+        changeFragment(R.id.profile_fragment_host, ProfilePreferenceFragment())
+
+
         return v
+    }
+
+    override fun onDetach() {
+        shouldShowHomeButton(activity, false)
+        super.onDetach()
     }
 }

@@ -2,4 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="second_options_layout_margin">10dp</dimen>
     <dimen name="default_weight">50</dimen>
+
+
+    <!-- CardView -->
+    <dimen name="cardview_width">160dp</dimen>
+    <dimen name="cardview_height">160dp</dimen>
+    <dimen name="cardview_image_width">64dp</dimen>
+    <dimen name="cardview_image_height">64dp</dimen>
 </resources>

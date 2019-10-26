@@ -29,4 +29,8 @@ object Constants {
 
     val MAPVIEW_BUNDLE_KEY = "MapViewBundleKey"
 
+    // BackStacks
+    val BACKSTACK_PROFILE = "BACKSTACK_PROFILE"
+    val BACKSTACK_HOME = "BACKSTACK_HOME"
+
 }
