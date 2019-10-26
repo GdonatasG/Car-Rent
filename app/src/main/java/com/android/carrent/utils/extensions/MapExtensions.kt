@@ -5,7 +5,6 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.util.Log
 import android.widget.Toast
 import com.android.carrent.R
 import com.android.carrent.utils.constants.Constants
@@ -15,7 +14,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import java.io.IOException
 import java.util.*
-import kotlin.coroutines.experimental.coroutineContext
 
 fun setCameraView(googleMap: GoogleMap, location: Location?) {
     googleMap.moveCamera(

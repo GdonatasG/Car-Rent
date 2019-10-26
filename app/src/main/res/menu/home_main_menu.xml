@@ -8,4 +8,10 @@
             android:title="Filter"
             app:showAsAction="ifRoom|collapseActionView"/>
 
+    <item
+            android:id="@+id/btn_profile"
+            android:icon="@drawable/ic_person_white_24dp"
+            android:title="Profile"
+            app:showAsAction="ifRoom|collapseActionView"/>
+
 </menu>

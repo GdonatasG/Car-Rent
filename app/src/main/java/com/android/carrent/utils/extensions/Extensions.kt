@@ -6,13 +6,11 @@ import android.graphics.Typeface
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import com.android.carrent.R
+import com.android.carrent.activities.MainActivity
 import com.android.carrent.utils.constants.Constants
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 
 fun setLogoAndFormFadeIn(context: Context, iv_logo: ImageView, form: LinearLayout) {
@@ -42,11 +40,19 @@ fun hideProgressBar(b: ProgressBar?) {
     b?.visibility = View.INVISIBLE
 }
 
-fun Fragment.changeFragment(fragment: Fragment) {
+fun Fragment.changeFragment(view: Int, fragment: Fragment) {
     activity?.supportFragmentManager
         ?.beginTransaction()
-        ?.replace(R.id.container_host, fragment)
-        ?.commitAllowingStateLoss()
+        ?.replace(view, fragment)
+        ?.commit()
+}
+
+fun Fragment.changeFragmentWithBackStack(view: Int, fragment: Fragment, tag: String) {
+    activity?.supportFragmentManager
+        ?.beginTransaction()
+        ?.replace(view, fragment)
+        ?.addToBackStack(tag)
+        ?.commit()
 }
 
 fun mainSnackbarView(snackbar: Snackbar?) {
@@ -58,4 +64,9 @@ fun mainSnackbarView(snackbar: Snackbar?) {
     snack_text_view?.typeface = Typeface.MONOSPACE
     snack_text_view?.maxLines = 2
     snack_text_view?.textSize = 12f
+}
+
+fun shouldShowHomeButton(activity: Activity?, shouldShow: Boolean) {
+    (activity as MainActivity).supportActionBar?.setDisplayShowHomeEnabled(shouldShow)
+    activity.supportActionBar?.setDisplayHomeAsUpEnabled(shouldShow)
 }

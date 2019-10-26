@@ -41,8 +41,7 @@
 
         </RelativeLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-              android:background="@color/colorPrimaryDark"/>
+        <View style="@style/layout_divider"/>
 
         <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                      android:layout_width="match_parent"

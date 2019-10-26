@@ -65,13 +65,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.tv_continue_as_guest -> {
-                changeFragment(fragment = HomeFragment())
+                changeFragment(R.id.container_host, fragment = HomeFragment())
             }
 
             R.id.tv_goto_register -> {
                 Log.d(TAG, "Clicked on register textview")
                 if (!disabledWhileLogin) {
-                    changeFragment(fragment = RegisterFragment())
+                    changeFragment(R.id.container_host, fragment = RegisterFragment())
                 }
             }
 
@@ -105,7 +105,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             ?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     Log.d(TAG, "User logged in, starting HomeFragment")
-                    changeFragment(fragment = HomeFragment())
+                    changeFragment(R.id.container_host, fragment = HomeFragment())
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
                     makeToast(it.exception?.message.toString())
