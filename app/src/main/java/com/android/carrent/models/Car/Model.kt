@@ -7,6 +7,8 @@ class Model {
     var title: String? = null
     @PropertyName("photoUrl")
     var photoUrl: String? = null
+    @PropertyName("releaseDate")
+    var releaseDate: String? = null
     @PropertyName("gasType")
     var gasType: String? = null
     @PropertyName("fullTankCapacity")
@@ -27,6 +29,7 @@ class Model {
     constructor(
         title: String?,
         photoUrl: String?,
+        releaseDate: String?,
         gasType: String?,
         fullTankCapacity: Float?,
         tankLeft: Float?,
@@ -37,6 +40,7 @@ class Model {
     ) {
         this.title = title
         this.photoUrl = photoUrl
+        this.releaseDate = releaseDate
         this.gasType = gasType
         this.fullTankCapacity = fullTankCapacity
         this.tankLeft = tankLeft

@@ -41,7 +41,7 @@
 
         </RelativeLayout>
 
-        <View style="@style/layout_divider"/>
+        <View style="@style/layout_divider_normal"/>
 
         <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                      android:layout_width="match_parent"

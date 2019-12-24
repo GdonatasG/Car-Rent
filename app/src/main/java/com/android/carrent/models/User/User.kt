@@ -1,6 +1,7 @@
-package com.android.carrent.models
+package com.android.carrent.models.User
 
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
 
 class User {
     @Exclude
@@ -9,7 +10,8 @@ class User {
     var email: String? = null
     var phone: String? = null
     var balance: Float? = null
-    var rentedCarId: Int? = null
+    @PropertyName("rent")
+    var rent: Rent? = null
 
     constructor() {}
 
@@ -19,14 +21,14 @@ class User {
         email: String?,
         phone: String?,
         balance: Float?,
-        rentedCarId: Int?
+        rent: Rent?
     ) {
         this.id = id
         this.username = username
         this.email = email
         this.phone = phone
         this.balance = balance
-        this.rentedCarId = rentedCarId
+        this.rent = rent
     }
 
 }

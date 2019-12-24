@@ -12,7 +12,8 @@ import android.view.ViewGroup
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.fragments.HomeFragment.HomeFragment
-import com.android.carrent.models.User
+import com.android.carrent.models.User.Rent
+import com.android.carrent.models.User.User
 import com.android.carrent.utils.constants.Constants
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.auth.FirebaseAuth
@@ -107,8 +108,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 et_email.text.toString(),
                 et_password.text.toString(),
                 et_phone.text.toString(),
-                0f,
-                0
+                0f
             )
         }
     }
@@ -118,8 +118,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         email: String,
         password: String,
         phone: String,
-        balance: Float?,
-        rentedCarId: Int?
+        balance: Float?
     ) {
         mAuth?.createUserWithEmailAndPassword(email, password)
             ?.addOnCompleteListener {
@@ -127,9 +126,17 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                     Log.d(TAG, "Registration completed!")
                     val uid = FirebaseAuth.getInstance().uid ?: ""
                     val ref =
-                        FirebaseFirestore.getInstance().collection(Constants.FIRESTORE_USERS_REFERENCE).document(uid)
+                        FirebaseFirestore.getInstance()
+                            .collection(Constants.FIRESTORE_USERS_REFERENCE).document(uid)
 
-                    val user = User(uid, username, email, phone, balance, rentedCarId)
+                    val user = User(
+                        uid,
+                        username,
+                        email,
+                        phone,
+                        balance,
+                        Rent(false, null, null, 0)
+                    )
                     ref.set(user)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {

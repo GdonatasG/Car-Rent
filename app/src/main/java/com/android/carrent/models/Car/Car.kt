@@ -19,7 +19,14 @@ class Car {
 
     constructor() {}
 
-    constructor(id: Int?, plateNumber: String?, location: GeoPoint?, model: Model, rate: Rate, rent: Rent) {
+    constructor(
+        id: Int?,
+        plateNumber: String?,
+        location: GeoPoint?,
+        model: Model,
+        rate: Rate,
+        rent: Rent
+    ) {
         this.id = id
         this.plateNumber = plateNumber
         this.location = location

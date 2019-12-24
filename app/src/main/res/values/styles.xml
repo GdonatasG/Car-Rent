@@ -105,13 +105,19 @@
 
     </style>
 
-    <style name="layout_divider">
+    <style name="layout_divider_normal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="layout_divider_light" parent="@style/layout_divider">
+    <style name="layout_divider_small">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="layout_divider_light" parent="@style/layout_divider_normal">
         <item name="android:background">@android:color/darker_gray</item>
     </style>
 
@@ -142,8 +148,9 @@
         <item name="android:fontFamily">monospace</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!-- CardView item-->
 
@@ -178,7 +185,7 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="cardview_divider" parent="@style/layout_divider">
+    <style name="cardview_divider" parent="@style/layout_divider_normal">
         <item name="android:layout_marginTop">7dp</item>
         <item name="android:layout_marginBottom">7dp</item>
         <item name="android:layout_marginLeft">4dp</item>
@@ -187,6 +194,23 @@
 
     <style name="cardview_layout_bg">
         <item name="android:background">@color/lightgray</item>
+    </style>
+
+    <!-- Car details cardviews -->
+    <style name="TextCardViewRegular">
+        <item name="android:textColor">@color/lightgray</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">12.5sp</item>
+    </style>
+
+    <style name="TextCardViewTitleItalic">
+        <item name="android:textColor">@color/lightgray</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">13.5sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLength">30</item>
+        <item name="android:maxLines">1</item>
     </style>
 
 

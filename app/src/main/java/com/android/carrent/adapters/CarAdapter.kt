@@ -14,8 +14,14 @@ import com.android.carrent.utils.extensions.getDistance
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.car_layout.view.*
 
-class CarAdapter(var carList: MutableList<Car>, var context: Context, var deviceLocation: Location? = null) :
+class CarAdapter(
+    var carList: MutableList<Car>? = null,
+    var context: Context,
+    var deviceLocation: Location? = null
+) :
     RecyclerView.Adapter<CarAdapter.CarHolder>() {
+
+    var onItemClick: ((Car) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.car_layout, parent, false)
@@ -24,11 +30,11 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
     }
 
     override fun getItemCount(): Int {
-        return carList.size
+        return carList!!.size
     }
 
     override fun onBindViewHolder(holder: CarHolder, position: Int) {
-        val car = carList[position]
+        val car = carList!![position]
         holder.setData(car, position)
     }
 
@@ -39,6 +45,7 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
     }
 
     inner class CarHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         var currentCar: Car? = null
         var currentPosition: Int = 0
 
@@ -46,9 +53,12 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
             car?.let {
                 itemView.tv_title.text = it.model.title
 
-                //setCarAddressCity(it.location!!.latitude, it.location!!.longitude)
+                setCarAddressCity(it.location!!.latitude, it.location!!.longitude)
                 setCarIconStatus(it.rent.rented)
                 setCarDistance(it.location)
+                itemView.setOnClickListener {
+                    onItemClick?.invoke(carList!![adapterPosition])
+                }
             }
 
             this.currentCar = car
@@ -89,10 +99,10 @@ class CarAdapter(var carList: MutableList<Car>, var context: Context, var device
         private fun setCarAddressCity(lat: Double, lng: Double) {
             itemView.tv_address.text =
                 getAddress(
-                lat = lat,
-                lng = lng,
-                context = context
-            ).locality
+                    lat = lat,
+                    lng = lng,
+                    context = context
+                ).locality
 
         }
 

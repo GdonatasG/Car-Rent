@@ -40,6 +40,10 @@ fun hideProgressBar(b: ProgressBar?) {
     b?.visibility = View.INVISIBLE
 }
 
+fun Fragment.clearBackStack() {
+    activity?.supportFragmentManager?.popBackStack()
+}
+
 fun Fragment.changeFragment(view: Int, fragment: Fragment) {
     activity?.supportFragmentManager
         ?.beginTransaction()
@@ -47,23 +51,29 @@ fun Fragment.changeFragment(view: Int, fragment: Fragment) {
         ?.commit()
 }
 
-fun Fragment.changeFragmentWithBackStack(view: Int, fragment: Fragment, tag: String) {
+fun Fragment.addFragmentWithBackStack(view: Int, fragment: Fragment, tag: String) {
     activity?.supportFragmentManager
         ?.beginTransaction()
-        ?.replace(view, fragment)
+        ?.add(view, fragment)
         ?.addToBackStack(tag)
         ?.commit()
 }
 
-fun mainSnackbarView(snackbar: Snackbar?) {
+
+fun mainSnackbarView(snackbar: Snackbar?, activity: Activity?) {
     val snack_root_view = snackbar?.view
 
     val snack_text_view = snack_root_view
         ?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
 
+    val snack_action_view =
+        snack_root_view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_action)
+
     snack_text_view?.typeface = Typeface.MONOSPACE
     snack_text_view?.maxLines = 2
     snack_text_view?.textSize = 12f
+
+    snack_action_view?.setTextColor(activity?.resources?.getColor(R.color.orange)!!)
 }
 
 fun shouldShowHomeButton(activity: Activity?, shouldShow: Boolean) {
