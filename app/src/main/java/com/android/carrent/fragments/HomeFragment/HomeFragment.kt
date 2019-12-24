@@ -13,9 +13,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,10 +24,13 @@ import com.android.carrent.activities.MainActivity
 import com.android.carrent.adapters.CarAdapter
 import com.android.carrent.firestore.car.CarListCallback
 import com.android.carrent.fragments.authentication.LoginFragment
+import com.android.carrent.fragments.CarFragment.CarFragment
 import com.android.carrent.fragments.profile.ProfileFragment
 import com.android.carrent.models.Car.Car
 import com.android.carrent.utils.*
-import com.android.carrent.utils.constants.Constants.BACKSTACK_HOME
+import com.android.carrent.utils.constants.Constants.BACKSTACK_CAR_FRAGMENT
+import com.android.carrent.utils.constants.Constants.BACKSTACK_PROFILE_FRAGMENT
+import com.android.carrent.utils.constants.Constants.BUNDLE_KEY_CAR_ID
 import com.android.carrent.utils.constants.Constants.FASTEST_INTERVAL
 import com.android.carrent.utils.constants.Constants.LAT_LNG_BOUNDS_OF_LITHUANIA
 import com.android.carrent.utils.constants.Constants.LOCATION_PERMISSIONS_REQUEST
@@ -55,6 +56,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
     private var TAG: String = "MainActivity"
+    private lateinit var mContext: Context
     // Is first attempt of location request
     private var isFirstAttempt = true
     // Filtering options
@@ -74,7 +76,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     // Widgets
     private lateinit var mMap: MapView
     // Car
-    private lateinit var carAdapter: CarAdapter
+    private var carAdapter: CarAdapter? = null
     private var carList = mutableListOf<Car>()
     private var modifiedCarList = mutableListOf<Car>()
     // GoogleMap
@@ -87,6 +89,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         super.onCreate(savedInstanceState)
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
+
+        configureGoogleApiClient()
+        mLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        mMapServiceGpsRequests = MapServiceGpsRequests(activity!!)
     }
 
     override fun onCreateView(
@@ -115,22 +121,26 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         divider.setDrawable(resources.getDrawable(R.drawable.car_item_divider))
         v.rv_list.addItemDecoration(divider)
 
-        // Layout weight animations/manipulations
-        mLayoutWeightAnimations =
-            LayoutWeightAnimations(mapView = v.map_container, recyclerView = v.rv_list_container, context = context!!)
-        v.btn_full_screen_map.setOnClickListener(this)
-
 
         // map init, location updates
         mMap = v.mapview
         initMap(savedInstanceState)
-        configureGoogleApiClient()
-        mLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        mMapServiceGpsRequests = MapServiceGpsRequests(activity!!)
-
         mMapServiceGpsRequests.checkLocation()
 
         return v
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Layout weight animations/manipulations
+        mLayoutWeightAnimations =
+            LayoutWeightAnimations(
+                mapView = view.map_container,
+                recyclerView = view.rv_list_container,
+                context = mContext
+            )
+        view.btn_full_screen_map.setOnClickListener(this)
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -176,7 +186,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     private fun configureGoogleApiClient() {
-        mGoogleApiClient = GoogleApiClient.Builder(context!!)
+        mGoogleApiClient = GoogleApiClient.Builder(mContext)
             .addConnectionCallbacks(this)
             .addOnConnectionFailedListener(this)
             .addApi(LocationServices.API)
@@ -185,11 +195,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     private fun checkPermissions(): Boolean {
         return (ActivityCompat.checkSelfPermission(
-            context!!,
+            mContext,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(
-            context!!,
+            mContext,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
                 )
@@ -242,54 +252,55 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     override fun onLocationChanged(p0: Location?) {
         viewModel.getAllCars(object : CarListCallback {
-            override fun onCarListCallback(list: MutableList<Car>) {
-                carList = list
-                viewModel.handleListUpdates(
-                    carList = carList,
-                    modifiedCarList = modifiedCarList
-                )
+            override fun onCarListCallback(list: MutableList<Car>?) {
+                list?.let {
 
-                // Checking which list is used:
-                // * If modified list is used, then updating this list, setting adapter and map markers
-                // * If modified list is not used, then updating default carList, setting adapter and map markers
-                if (modifiedCarList.isNotEmpty() || isListFiltered) { // modified list used
-                    modifiedCarList = viewModel.filterList(
-                        modifiedCarList = modifiedCarList,
-                        carList = carList,
-                        filteringArrayCheckedModified = filteringArrayCheckedModified,
-                        filterText = filterText,
-                        context = context!!
+
+                    viewModel.handleListUpdates(
+                        carList = it,
+                        modifiedCarList = modifiedCarList
                     )
-                    viewModel.sortCarList(modifiedCarList, p0)
-                    carAdapter = CarAdapter(modifiedCarList, context!!, p0)
-                    view?.rv_list?.adapter = carAdapter
-                    viewModel.addMapMarkers(
-                        map = mGoogleMap,
-                        list = modifiedCarList,
-                        context = activity?.applicationContext
-                    )
-                } else { // modified list is not used
-                    viewModel.sortCarList(carList, p0)
-                    carAdapter = CarAdapter(carList, context!!, p0)
-                    view?.rv_list?.adapter = carAdapter
-                    viewModel.addMapMarkers(
-                        map = mGoogleMap,
-                        list = carList,
-                        context = activity?.applicationContext
-                    )
+
+                    // Checking which list is used:
+                    // * If modified list is used, then updating this list, setting adapter and map markers
+                    // * If modified list is not used, then updating default carList, setting adapter and map markers
+                    if (modifiedCarList.isNotEmpty() || isListFiltered) { // modified list used
+                        modifiedCarList = viewModel.filterList(
+                            modifiedCarList = modifiedCarList,
+                            carList = it,
+                            filteringArrayCheckedModified = filteringArrayCheckedModified,
+                            filterText = filterText,
+                            context = mContext
+                        )
+                        viewModel.sortCarList(modifiedCarList, p0)
+                        setUpCarAdapter(modifiedCarList, p0)
+                        viewModel.addMapMarkers(
+                            map = mGoogleMap,
+                            list = modifiedCarList,
+                            context = mContext
+                        )
+                    } else { // modified list is not used
+                        viewModel.sortCarList(it, p0)
+                        setUpCarAdapter(it, p0)
+                        viewModel.addMapMarkers(
+                            map = mGoogleMap,
+                            list = it,
+                            context = mContext
+                        )
+                    }
+
+                    // If IT`S first time attempting location:
+                    // * Move camera to device location
+                    // * Let code to know that second time will not be first time
+                    if (isFirstAttempt) {
+                        setCameraView(googleMap = mGoogleMap, location = p0)
+                        isFirstAttempt = false
+                    }
+
+                    // Make RecyclerView visible and progressBar - not visible
+                    viewModel.rvListHandlerOnLocationSuccess(view?.rv_list, view?.pb_rv_list)
+
                 }
-
-                // If IT`S first time attempting location:
-                // * Move camera to device location
-                // * Let code to know that second time will not be first time
-                if (isFirstAttempt) {
-                    setCameraView(googleMap = mGoogleMap, location = p0)
-                    isFirstAttempt = false
-                }
-
-                // Make RecyclerView visible and progressBar - not visible
-                viewModel.rvListHandlerOnLocationSuccess(view?.rv_list, view?.pb_rv_list)
-
             }
 
         })
@@ -297,12 +308,40 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     }
 
+    private fun setUpCarAdapter(list: MutableList<Car>, p0: Location?) {
+        carAdapter = CarAdapter(list, mContext, p0)
+        view?.rv_list?.adapter = carAdapter
+
+        carAdapter?.onItemClick = {
+            goToCarFragment(it.id)
+        }
+    }
+
+    private fun goToCarFragment(id: Int?) {
+        id?.let {
+            val cFrag = CarFragment()
+            val bundle = Bundle()
+            bundle.putInt(BUNDLE_KEY_CAR_ID, it)
+            cFrag.arguments = bundle
+
+            addFragmentWithBackStack(
+                view = R.id.container_host,
+                fragment = cFrag,
+                tag = BACKSTACK_CAR_FRAGMENT
+            )
+        }
+    }
+
     private fun requestLocationPermissions(requestCode: Int) {
         requestPermissions(PERMISSIONS.toTypedArray(), requestCode)
     }
 
     @SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         when (requestCode) {
             LOCATION_PERMISSIONS_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
@@ -318,6 +357,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         val menuInflater: MenuInflater = activity!!.menuInflater
         menuInflater.inflate(R.menu.home_main_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -330,11 +370,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             }
 
             R.id.btn_profile -> {
-                if (mAuth?.currentUser == null) changeFragment(R.id.container_host, LoginFragment())
-                else changeFragmentWithBackStack(
+                if (mAuth?.currentUser == null) {
+                    mAuth?.signOut()
+                    clearBackStack()
+                    changeFragment(R.id.container_host, LoginFragment())
+                } else addFragmentWithBackStack(
                     view = R.id.container_host,
                     fragment = ProfileFragment(),
-                    tag = BACKSTACK_HOME
+                    tag = BACKSTACK_PROFILE_FRAGMENT
                 )
             }
         }
@@ -344,22 +387,24 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private fun performFiltering() {
         lateinit var dialog: AlertDialog
 
-        val layout = LinearLayout(context)
+        val layout = LinearLayout(mContext)
         layout.orientation = LinearLayout.VERTICAL
 
 
-        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AlertDialogCustom))
+        val builder = AlertDialog.Builder(ContextThemeWrapper(mContext, R.style.AlertDialogCustom))
         builder.setTitle(getText(R.string.filter_dialog_title))
 
-        val searchView = SearchView(ContextThemeWrapper(context, R.style.CustomEditTextForDialog))
+        val searchView = SearchView(ContextThemeWrapper(mContext, R.style.CustomEditTextForDialog))
 
         searchView.onActionViewExpanded()
         searchView.clearFocus()
         searchView.setIconifiedByDefault(false)
-        val icon: ImageView = searchView.findViewById(androidx.appcompat.R.id.search_mag_icon) as ImageView
+        val icon: ImageView =
+            searchView.findViewById(androidx.appcompat.R.id.search_mag_icon) as ImageView
         icon.layoutParams = LinearLayout.LayoutParams(0, 0) as ViewGroup.LayoutParams?
 
-        val editText = searchView.findViewById<SearchView>(androidx.appcompat.R.id.search_src_text) as EditText
+        val editText =
+            searchView.findViewById<SearchView>(androidx.appcompat.R.id.search_src_text) as EditText
         editText.hint = getText(R.string.searchview_hint)
         editText.setText(filterText)
         layout.addView(searchView)
@@ -384,23 +429,31 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             }
         }
 
-        builder.setMultiChoiceItems(filteringArray, filteringArrayCheckedModified) { _, which, isChecked ->
+        builder.setMultiChoiceItems(
+            filteringArray,
+            filteringArrayCheckedModified
+        ) { _, which, isChecked ->
             filteringArrayCheckedModified[which] = isChecked
         }
 
         builder.setPositiveButton("Filter") { _, _ ->
             filterText = editText.text.toString()
             isListFiltered = true
-            carAdapter.updateAdapter(
+            viewModel.rvListHandlerOnListLoading(view?.rv_list, view?.pb_rv_list)
+            carAdapter?.updateAdapter(
                 viewModel.filterList(
                     modifiedCarList = modifiedCarList,
                     carList = carList,
                     filteringArrayCheckedModified = filteringArrayCheckedModified,
                     filterText = filterText,
-                    context = context!!
+                    context = mContext
                 )
             )
-            viewModel.addMapMarkers(map = mGoogleMap, list = modifiedCarList, context = activity?.applicationContext)
+            viewModel.addMapMarkers(
+                map = mGoogleMap,
+                list = modifiedCarList,
+                context = mContext
+            )
 
         }
 
@@ -426,16 +479,22 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         when (v) {
             btn_full_screen_map -> {
                 if (mLayoutWeightAnimations.mMapLayoutState == mLayoutWeightAnimations.MAP_LAYOUT_STATE_CONTRACTED) {
-                    mLayoutWeightAnimations.mMapLayoutState = mLayoutWeightAnimations.MAP_LAYOUT_STATE_EXPANDED
+                    mLayoutWeightAnimations.mMapLayoutState =
+                        mLayoutWeightAnimations.MAP_LAYOUT_STATE_EXPANDED
                     mLayoutWeightAnimations.expandMapAnimation()
                 } else if (mLayoutWeightAnimations.mMapLayoutState == mLayoutWeightAnimations.MAP_LAYOUT_STATE_EXPANDED) {
-                    mLayoutWeightAnimations.mMapLayoutState = mLayoutWeightAnimations.MAP_LAYOUT_STATE_CONTRACTED
+                    mLayoutWeightAnimations.mMapLayoutState =
+                        mLayoutWeightAnimations.MAP_LAYOUT_STATE_CONTRACTED
                     mLayoutWeightAnimations.contractMapAnimation()
                 }
             }
         }
     }
 
+    override fun onAttach(context: Context) {
+        mContext = context
+        super.onAttach(context)
+    }
 
     override fun onResume() {
         super.onResume()

@@ -1,5 +1,7 @@
 package com.android.carrent.fragments.profile
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -8,9 +10,11 @@ import com.android.carrent.R
 import com.android.carrent.fragments.HomeFragment.HomeFragment
 import com.android.carrent.utils.extensions.changeFragment
 import com.android.carrent.utils.extensions.makeToast
+import com.android.carrent.utils.extensions.shouldShowHomeButton
 import com.google.firebase.auth.FirebaseAuth
 
-class ProfilePreferenceFragment : PreferenceFragmentCompat(), PreferenceManager.OnPreferenceTreeClickListener {
+class ProfilePreferenceFragment : PreferenceFragmentCompat(),
+    PreferenceManager.OnPreferenceTreeClickListener {
     // Firebase
     private var mAuth: FirebaseAuth? = null
     private var backPressedTime: Long = 0
@@ -19,6 +23,8 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(), PreferenceManager.
         addPreferencesFromResource(R.xml.profile_preferences)
         // Init firebase
         mAuth = FirebaseAuth.getInstance()
+
+        shouldShowHomeButton(activity, true)
 
     }
 
@@ -49,6 +55,7 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(), PreferenceManager.
             if (backPressedTime + 2000 > System.currentTimeMillis()) {
                 mAuth?.signOut()
                 changeFragment(R.id.container_host, HomeFragment())
+                shouldShowHomeButton(activity, false)
             } else {
                 makeToast(resources.getString(R.string.logout_press_again))
             }

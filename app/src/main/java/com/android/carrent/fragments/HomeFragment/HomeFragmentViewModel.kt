@@ -15,7 +15,7 @@ import com.android.carrent.firestore.car.FirestoreCarRepository
 import com.android.carrent.firestore.user.FirestoreUserRepository
 import com.android.carrent.models.Car.Car
 import com.android.carrent.models.ClusterMarker
-import com.android.carrent.models.User
+import com.android.carrent.models.User.User
 import com.android.carrent.utils.ClusterManagerRenderer
 import com.android.carrent.utils.constants.FilterConstants
 import com.android.carrent.utils.extensions.getAddress
@@ -38,15 +38,15 @@ class HomeFragmentViewModel : ViewModel() {
         userRepository.getUser(uid)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    Log.w(TAG, "Listen failed of user.", e)
+                    Log.w(TAG, "getUser: Listen failed of user.", e)
                     return@addSnapshotListener
                 }
 
                 if (snapshot != null && snapshot.exists()) {
-                    val u = snapshot.toObject(com.android.carrent.models.User::class.java)
+                    val u = snapshot.toObject(User::class.java)
                     user.value = u
                 } else {
-                    Log.d(TAG, "Snapshot data: null")
+                    Log.d(TAG, "getUser: Snapshot data: null")
                 }
             }
 
@@ -85,7 +85,7 @@ class HomeFragmentViewModel : ViewModel() {
         modifiedCarList.clear()
         modifiedCarList.addAll(carList)
 
-        for (i in 0 until filteringArrayCheckedModified.size) {
+        for (i in filteringArrayCheckedModified.indices) {
             when (FilterConstants.filteringArray[i]) {
                 FilterConstants.NOT_RENTED -> {
                     if (filteringArrayCheckedModified[i]) modifiedCarList.filter { it.rent.rented!! }.map {
@@ -200,6 +200,8 @@ class HomeFragmentViewModel : ViewModel() {
         rv?.visibility = View.GONE
         pb?.visibility = View.VISIBLE
     }
+
+
 
 
 }

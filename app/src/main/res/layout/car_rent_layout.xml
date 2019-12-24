@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+    <ImageButton
+            android:id="@+id/ib_date"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:background="@drawable/ic_date_range_lightgray_24dp" />
+
+    <TextView
+            style="@style/TextCardViewRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/car_rent_date" />
+
+    <TextView
+            android:id="@+id/tv_selected_date"
+            style="@style/TextCardViewRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="" />
+
+
+    <View
+            android:background="@color/colorPrimary"
+            style="@style/cardview_divider"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp" />
+
+
+    <TextView
+            style="@style/TextCardViewRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/car_rent_total_cost" />
+
+    <TextView
+            android:id="@+id/tv_total_cost"
+            style="@style/TextCardViewRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="" />
+
+</LinearLayout>

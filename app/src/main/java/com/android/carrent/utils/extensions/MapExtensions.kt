@@ -52,7 +52,6 @@ fun getDistance(lat1: Double?, lon1: Double?, lat2: Double?, lon2: Double?): Dou
 }
 
 fun getAddress(lat: Double, lng: Double, context: Context): Address {
-    Geocoder(context, Locale.getDefault())
     var addresses: List<Address> = listOf(Address(Locale.getDefault()))
 
     try {

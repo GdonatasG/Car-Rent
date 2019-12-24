@@ -5,4 +5,6 @@
     <color name="colorAccent">#2E8B57</color>
     <color name="lightgray">#f2f2f2</color>
     <color name="orange">#FFA500</color>
+    <color name="car_rented">#bf3313</color>
+    <color name="car_free">#1f9c55</color>
 </resources>

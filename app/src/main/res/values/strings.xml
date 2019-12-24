@@ -1,6 +1,7 @@
 <resources>
     <string name="maps_api">AIzaSyBp2iCJOmchco1BW7zIgIZ9Rc1nwv-dl_4</string>
     <string name="distance_value">km</string>
+    <string name="gas_measure_liter">L</string>
 
     <string name="app_name">Car Rent</string>
     <string name="login">Login</string>
@@ -16,6 +17,7 @@
     <string name="maps_error">Error: can`t make map requests.</string>
     <string name="address_error">Can`t get addresses. Restart your device</string>
     <string name="error_no_internet">No internet connection!</string>
+    <string name="snackbar_action_close">OK</string>
     <string name="filter_dialog_title">Filter cars</string>
 
     <!--EditText Hints-->
@@ -58,6 +60,38 @@
     <!-- Toolbar -->
     <string name="show_all">Show all</string>
     <string name="sort_nearest">Sort by nearest</string>
+
+    <!-- Car Fragment -->
+    <string name="CAR_RENT_ERROR_RENTED_OR_HAS_CAR">This car is rented or you already have a car!</string>
+    <string name="CAR_RENT_ERROR_MONEY">You don`t have enough money! Go to profile.</string>
+    <string name="CAR_RENT_ERROR_REQUIREMENTS_NOT_MET">Minimum time of rent is 1 hour!</string>
+    <string name="CAR_RENT_TWICE_CLICK">Click again to confirm rent</string>
+
+    <string name="ERROR_AUTH_REQUIRED">Authentication is needed for this action!</string>
+
+    <string name="car_rent_period">Select rent time</string>
+    <string name="car_rent_date">Selected to rent until:</string>
+    <string name="car_rent_total_cost">Total cost:</string>
+    <!-- Car details cardviews -->
+    <string name="car_info">Car Info</string>
+    <string name="car_model_title">Title:</string>
+    <string name="car_plate_number">Plate number:</string>
+    <string name="car_model_engine">Engine:</string>
+    <string name="car_gas_type">Gas type:</string>
+    <string name="car_release_date">Released:</string>
+
+    <string name="car_fuel_consumption">Fuel Consumption</string>
+    <string name="car_full_tank_capacity">Tank capacity:</string>
+    <string name="car_consumption">Consumption</string>
+    <string name="car_consumption_urban">Urban:</string>
+    <string name="car_tank_left">Tank left:</string>
+    <string name="car_consumption_combined">Combined:</string>
+    <string name="car_consumption_highway">Highway:</string>
+
+    <string name="car_location">Location</string>
+    <string name="car_located">This car is located:</string>
+
+    <string name="btn_rent">Rent</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

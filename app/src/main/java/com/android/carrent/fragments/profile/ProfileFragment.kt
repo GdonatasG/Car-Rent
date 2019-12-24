@@ -1,11 +1,10 @@
 package com.android.carrent.fragments.profile
 
 
+import android.content.Context
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
@@ -19,7 +18,6 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAuth = FirebaseAuth.getInstance()
     }
 
     override fun onCreateView(
@@ -29,19 +27,31 @@ class ProfileFragment : Fragment() {
         // Inflate the layout for this fragment
         val v: View? = inflater.inflate(R.layout.fragment_profile, container, false)
 
+        mAuth = FirebaseAuth.getInstance()
+
         // Enable needed widgets
         (activity as MainActivity).enabledWidgets()
 
         setHasOptionsMenu(true)
-        shouldShowHomeButton(activity, true)
 
         changeFragment(R.id.profile_fragment_host, ProfilePreferenceFragment())
-
 
         return v
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onAttach(context: Context) {
+        println("attached")
+        shouldShowHomeButton(activity, true)
+        super.onAttach(context)
+    }
+
     override fun onDetach() {
+        println("detached")
         shouldShowHomeButton(activity, false)
         super.onDetach()
     }
