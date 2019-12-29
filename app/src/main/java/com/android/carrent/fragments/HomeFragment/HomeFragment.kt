@@ -22,8 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.adapters.CarAdapter
-import com.android.carrent.firestore.car.CarListCallback
-import com.android.carrent.fragments.authentication.LoginFragment
+import com.android.carrent.firebase.car.CarListCallback
 import com.android.carrent.fragments.CarFragment.CarFragment
 import com.android.carrent.fragments.profile.ProfileFragment
 import com.android.carrent.models.Car.Car
@@ -46,7 +45,6 @@ import com.google.android.gms.location.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.Marker
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
@@ -63,6 +61,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var filterText: String = ""
     private var isListFiltered = false
     var filteringArrayCheckedModified = filteringArrayChecked.copyOf()
+    //Firebase
+    private lateinit var mAuth: FirebaseAuth
+    private var mAuthStateListener: FirebaseAuth.AuthStateListener? = null
+
     // ViewModel
     private lateinit var viewModel: HomeFragmentViewModel
     // Location
@@ -71,8 +73,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     private var mLocation: Location? = null
     private var mLocationManager: LocationManager? = null
     private var mLocationRequest: LocationRequest? = null
-    // Firebase
-    private var mAuth: FirebaseAuth? = null
     // Widgets
     private lateinit var mMap: MapView
     // Car
@@ -87,12 +87,15 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Init firebase
-        mAuth = FirebaseAuth.getInstance()
 
         configureGoogleApiClient()
         mLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         mMapServiceGpsRequests = MapServiceGpsRequests(activity!!)
+
+        mAuth = FirebaseAuth.getInstance()
+        mAuthStateListener = FirebaseAuth.AuthStateListener {
+            mAuth = it
+        }
     }
 
     override fun onCreateView(
@@ -101,16 +104,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     ): View? {
         // Inflate the layout for this fragment
         val v: View = inflater.inflate(R.layout.fragment_home, container, false)
-
         // Enable needed widgets
         (activity as MainActivity).enabledWidgets()
-
-        // toolbar
-        setHasOptionsMenu(true)
+        shouldShowHomeButton(activity, false)
 
         // Init ViewModel
-        viewModel = ViewModelProviders.of(activity!!).get(HomeFragmentViewModel::class.java)
-
+        viewModel = ViewModelProviders.of(this).get(HomeFragmentViewModel::class.java)
 
         // Layout for RecyclerView of Cars
         val layoutManager = LinearLayoutManager(activity)
@@ -126,6 +125,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         mMap = v.mapview
         initMap(savedInstanceState)
         mMapServiceGpsRequests.checkLocation()
+
+        // toolbar
+        setHasOptionsMenu(true)
 
         return v
     }
@@ -169,15 +171,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     @SuppressLint("MissingPermission")
     override fun onMapReady(map: GoogleMap) {
         mGoogleMap = map
+
         setCameraViewWBounds(mGoogleMap, LAT_LNG_BOUNDS_OF_LITHUANIA)
 
-        map.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
-            override fun onMarkerClick(p0: Marker?): Boolean {
-                // DetailFragment soon
-                return true
-            }
-
-        })
+        map.setOnMarkerClickListener { p0 ->
+            goToCarFragment(p0?.snippet?.toInt())
+            true
+        }
 
         if (checkPermissions()) {
             enableDeviceLocationWButton(map)
@@ -370,10 +370,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             }
 
             R.id.btn_profile -> {
-                if (mAuth?.currentUser == null) {
-                    mAuth?.signOut()
-                    clearBackStack()
-                    changeFragment(R.id.container_host, LoginFragment())
+                mAuth.currentUser?.reload()
+                if (mAuth.currentUser == null) {
+                    noUserGoToLogin(view = R.id.container_host)
                 } else addFragmentWithBackStack(
                     view = R.id.container_host,
                     fragment = ProfileFragment(),
@@ -505,6 +504,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     override fun onStart() {
         super.onStart()
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener!!)
         mMap.onStart()
         if (mGoogleApiClient != null) {
             mGoogleApiClient!!.connect()
@@ -513,6 +513,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
 
     override fun onStop() {
         super.onStop()
+        if (mAuthStateListener != null) FirebaseAuth.getInstance().removeAuthStateListener(
+            mAuthStateListener!!
+        )
         mMap.onStop()
         if (mGoogleApiClient!!.isConnected()) {
             mGoogleApiClient!!.disconnect()

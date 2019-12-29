@@ -12,25 +12,23 @@ import android.view.ViewGroup
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.fragments.HomeFragment.HomeFragment
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
 import com.android.carrent.utils.extensions.*
+import com.google.firebase.auth.FirebaseAuth
 
 
 class LoginFragment : Fragment(), View.OnClickListener {
     private var TAG: String = "LoginFragment"
 
+    private lateinit var mAuth: FirebaseAuth
+
     // Variable to disable action while logging in
     private var disabledWhileLogin = false
-
-    // Firebase
-    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Init firebaseAuth
         mAuth = FirebaseAuth.getInstance()
 
         // Disable widgets
@@ -101,11 +99,19 @@ class LoginFragment : Fragment(), View.OnClickListener {
     }
 
     private fun login(email: String, password: String) {
-        mAuth?.signInWithEmailAndPassword(email, password)
-            ?.addOnCompleteListener {
+        mAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d(TAG, "User logged in, starting HomeFragment")
-                    changeFragment(R.id.container_host, fragment = HomeFragment())
+                    if (mAuth.currentUser?.isEmailVerified!!) {
+                        Log.d(TAG, "User logged in, starting HomeFragment")
+                        changeFragment(R.id.container_host, fragment = HomeFragment())
+                    } else {
+                        mAuth.signOut()
+                        makeToast(resources.getString(R.string.not_verified))
+                        disabledWhileLogin = false
+                        hideProgressBar(progress_bar)
+                    }
+
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
                     makeToast(it.exception?.message.toString())
@@ -113,5 +119,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     hideProgressBar(progress_bar)
                 }
             }
+
+
     }
 }

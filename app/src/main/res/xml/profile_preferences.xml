@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Preference
-            android:layout="@layout/custom_preference_item_layout"
             android:icon="@drawable/ic_directions_car_preference_28dp"
             android:key="@string/KEY_MY_CAR"
-            android:title="@string/my_car_title"
-            android:summary="@string/my_car_summary"/>
+            android:layout="@layout/custom_preference_item_layout"
+            android:summary="@string/my_car_summary"
+            android:title="@string/my_car_title" />
 
     <Preference
-            android:layout="@layout/custom_preference_item_layout"
+            android:icon="@drawable/ic_credit_card_preference_28dp"
+            android:key="@string/KEY_ADD_FUNDS"
+            android:summary="@string/add_funds_summary"
+            android:title="@string/add_funds_title"
+            app:layout="@layout/custom_preference_item_layout" />
+
+    <Preference
             android:icon="@drawable/ic_edit_preference_28dp"
             android:key="@string/KEY_EDIT_PROFILE"
-            android:title="@string/edit_profile_title"
-            android:summary="@string/edit_profile_summary"/>
+            android:layout="@layout/custom_preference_item_layout"
+            android:summary="@string/edit_profile_summary"
+            android:title="@string/edit_profile_title" />
 
     <Preference
-            android:layout="@layout/custom_preference_item_layout"
-            android:icon="@drawable/ic_lock_preference_28dp"
-            android:key="@string/KEY_CHANGE_PASSWORD"
-            android:title="@string/change_password_title"
-            android:summary="@string/change_password_summary"/>
-
-    <Preference
-            android:layout="@layout/custom_preference_item_layout"
             android:icon="@drawable/ic_exit_to_app_preference_28dp"
             android:key="@string/KEY_LOGOUT"
-            android:title="@string/logout_title"
-            android:summary="@string/logout_summary"/>
+            android:layout="@layout/custom_preference_item_layout"
+            android:summary="@string/logout_summary"
+            android:title="@string/logout_title" />
 
 
 </PreferenceScreen>

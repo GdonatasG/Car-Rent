@@ -60,7 +60,7 @@
     <style name="progress_bar">
         <item name="android:layout_width">30dp</item>
         <item name="android:layout_height">30dp</item>
-        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:visibility">invisible</item>
         <item name="android:indeterminateTint">@color/lightgray</item>
@@ -71,6 +71,10 @@
         <item name="android:layout_height">30dp</item>
         <item name="android:visibility">visible</item>
         <item name="android:indeterminateTint">@color/colorPrimary</item>
+    </style>
+
+    <style name="progress_dialog_bar" parent="android:Theme.Material.Dialog">
+        <item name="android:indeterminateTint">@color/orange</item>
     </style>
 
     <style name="iv_logo">

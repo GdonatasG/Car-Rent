@@ -3,6 +3,7 @@ package com.android.carrent.fragments.CarFragment
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
@@ -33,12 +34,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.android.carrent.fragments.authentication.LoginFragment
 import com.android.carrent.models.User.User
+import com.android.carrent.utils.constants.Constants.DATE_FORMAT
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.car_rent_layout.view.*
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -48,11 +48,15 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     // View of Fragment
     private var mView: View? = null
 
-    // Firebase
-    private var mAuth: FirebaseAuth? = null
+    // Context (to ensure that not null)
+    private lateinit var mContext: Context
 
     // GoogleMap
     private lateinit var mGoogleMap: GoogleMap
+
+    //Firebase
+    private lateinit var mAuth: FirebaseAuth
+    private var mAuthStateListener: FirebaseAuth.AuthStateListener? = null
 
     // Widgets
     private lateinit var mMap: MapView
@@ -64,8 +68,6 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private var car: MutableLiveData<Car> = MutableLiveData()
     private var user: MutableLiveData<User> = MutableLiveData()
 
-    // Car renting, date and time pickers
-    var formateDate = SimpleDateFormat("dd.MM.YYYY, HH:mm", Locale.getDefault())
     // To confirm rent, user have to press confirm button twice in some sort of time
     private var backPressedTime: Long = 0
 
@@ -83,6 +85,10 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         mAuth = FirebaseAuth.getInstance()
+        mAuthStateListener = FirebaseAuth.AuthStateListener {
+            mAuth = it
+        }
+
 
         // Enable needed widgets
         (activity as MainActivity).enabledWidgets()
@@ -115,7 +121,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         mView?.btn_rent?.setOnClickListener(this)
 
         // Loading user data
-        loadUser(mAuth?.currentUser?.uid)
+        loadUser(mAuth.currentUser?.uid)
 
         // Loading Location layout map
         mMap = mView?.mapview!!
@@ -144,10 +150,6 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
             setUpCarLocation(it)
             setUpRentButton(it.rent.rented)
         })
-    }
-
-    private fun setToolbarTitle(title: String?) {
-        (activity as MainActivity).setToolbarTitle(title)
     }
 
     private fun loadCarImage(url: String?) {
@@ -248,7 +250,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         location.longitude = car.location!!.longitude
         setCameraView(googleMap = mGoogleMap, location = location)
 
-        viewModel.addMapMarker(map = mGoogleMap, car = car, context = context)
+        viewModel.addMapMarker(map = mGoogleMap, car = car, context = mContext)
 
         mView?.car_location?.tv_located?.text =
             Html.fromHtml(
@@ -256,15 +258,15 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                     getAddress(
                         car.location!!.latitude,
                         car.location!!.longitude,
-                        context!!
+                        mContext
                     ).thoroughfare + " " + getAddress(
                         car.location!!.latitude,
                         car.location!!.longitude,
-                        context!!
+                        mContext
                     ).subThoroughfare + ", " + getAddress(
                         car.location!!.latitude,
                         car.location!!.longitude,
-                        context!!
+                        mContext
                     ).locality
                 )
             )
@@ -312,12 +314,9 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
             }
 
             com.android.carrent.R.id.btn_rent -> {
-                if (user.value == null) {
-                    mAuth?.signOut()
-                    clearBackStack()
-                    changeFragment(R.id.container_host, LoginFragment())
-                    // Clearing title of toolbar
-                    makeToast(resources.getString(R.string.ERROR_AUTH_REQUIRED))
+                mAuth.currentUser?.reload()
+                if (mAuth.currentUser == null) {
+                    noUserGoToLogin(view = R.id.container_host)
                 } else {
                     if (isRentedOrHaveRented()) makeToast(
                         resources.getString(
@@ -335,12 +334,12 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private fun performRent() {
         lateinit var dialog: AlertDialog
 
-        val layout = LinearLayout(context)
+        val layout = LinearLayout(mContext)
         val v = layoutInflater.inflate(R.layout.car_rent_layout, null)
         layout.orientation = LinearLayout.VERTICAL
 
 
-        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AlertDialogCustom))
+        val builder = AlertDialog.Builder(ContextThemeWrapper(mContext, R.style.AlertDialogCustom))
         builder.setTitle(getText(R.string.car_rent_period))
         builder.setView(v)
 
@@ -359,43 +358,52 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             // User have to click confirm button twice in some sort of time to ensure rent
+            mAuth.currentUser?.reload()
             if (backPressedTime + 3000 > System.currentTimeMillis()) {
                 // To rent car, user:
-                // Must be connected to the internet, must meet the rent time requirements,
-                // Must be logged in, mustn`t have rented car or aimed car mustn`t be rented
+                // Must be connected to the internet
+                // Must be logged in
+                // Must meet the rent time requirements,
+                // Mustn`t have rented car or aimed car mustn`t be rented
                 // Must have enough money in the balance
                 if ((activity as MainActivity).isInternetOn) {
-                    if (areRequirementsMet()) {
-                        if (!isRentedOrHaveRented()) {
-                            totalRentSum = totalRentSum()
-                            if (user.value?.balance!! >= totalRentSum) {
-                                val rentStarted = Timestamp(Calendar.getInstance().time)
-                                val rentedUntil = Timestamp(selectedDate.time)
+                    mAuth.currentUser?.reload()
+                    if (mAuth.currentUser != null) {
+                        if (areRequirementsMet()) {
+                            if (!isRentedOrHaveRented()) {
+                                totalRentSum = totalRentSum()
+                                if (user.value?.balance!! >= totalRentSum) {
+                                    val rentStarted = Timestamp(Calendar.getInstance().time)
+                                    val rentedUntil = Timestamp(selectedDate.time)
 
-                                // Updating user
-                                user.value?.rent?.hasCar = true
-                                user.value?.rent?.rentedCarId = car.value?.id
-                                user.value?.rent?.rentStarted = rentStarted
-                                user.value?.rent?.rentedUntil = rentedUntil
-                                user.value?.balance = user.value?.balance!! - totalRentSum
-                                viewModel.updateUser(user.value)
+                                    // Updating user
+                                    user.value?.rent?.hasCar = true
+                                    user.value?.rent?.rentedCarId = car.value?.id
+                                    user.value?.rent?.rentStarted = rentStarted
+                                    user.value?.rent?.rentedUntil = rentedUntil
+                                    user.value?.balance = user.value?.balance!! - totalRentSum
+                                    viewModel.updateUser(user.value)
 
-                                // Updating car
-                                car.value?.rent?.rented = true
-                                car.value?.rent?.rentStarted = rentStarted
-                                car.value?.rent?.rentedUntil = rentedUntil
-                                car.value?.rent?.rentedById = user.value?.id
-                                viewModel.updateCar(car.value)
+                                    // Updating car
+                                    car.value?.rent?.rented = true
+                                    car.value?.rent?.rentStarted = rentStarted
+                                    car.value?.rent?.rentedUntil = rentedUntil
+                                    car.value?.rent?.rentedById = user.value?.id
+                                    viewModel.updateCar(car.value)
 
-                                // Start CarManagement fragment (SOON)
+                                    // Start CarManagement fragment (SOON)
 
 
-                            } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_MONEY))
-                        } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR))
-                    } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_REQUIREMENTS_NOT_MET))
-
+                                } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_MONEY))
+                            } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR))
+                        } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_REQUIREMENTS_NOT_MET))
+                    } else {
+                        dialog.dismiss()
+                        noUserGoToLogin(view = R.id.container_host)
+                    }
                 } else (activity as MainActivity).showNetworkMessage()
             } else makeToast(resources.getString(R.string.CAR_RENT_TWICE_CLICK))
+
 
 
             backPressedTime = System.currentTimeMillis()
@@ -403,14 +411,14 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
 
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
             val dpd = DatePickerDialog(
-                context!!,
+                mContext,
                 DatePickerDialog.OnDateSetListener { view, i, i2, i3 ->
                     selectedDate.set(Calendar.YEAR, i)
                     selectedDate.set(Calendar.MONTH, i2)
                     selectedDate.set(Calendar.DAY_OF_MONTH, i3)
                     isDateSelected = true
                     val tp = TimePickerDialog(
-                        context!!,
+                        mContext,
                         TimePickerDialog.OnTimeSetListener { timePicker, j, j2 ->
                             selectedDate.set(Calendar.HOUR_OF_DAY, j)
                             selectedDate.set(Calendar.MINUTE, j2)
@@ -510,7 +518,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
             tvDate.text =
                 Html.fromHtml(
                     detailCarColorBold(
-                        formateDate.format(
+                        DATE_FORMAT.format(
                             selectedDate.time
                         )
                     )
@@ -550,6 +558,11 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onAttach(context: Context) {
+        mContext = context
+        super.onAttach(context)
+    }
+
     override fun onResume() {
         mMap.onResume()
         super.onResume()
@@ -564,11 +577,15 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     }
 
     override fun onStart() {
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener!!)
         mMap.onStart()
         super.onStart()
     }
 
     override fun onStop() {
+        if (mAuthStateListener != null) FirebaseAuth.getInstance().removeAuthStateListener(
+            mAuthStateListener!!
+        )
         mMap.onStop()
         super.onStop()
     }

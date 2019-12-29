@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/lightgray"
@@ -14,22 +14,23 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_scrollFlags="scroll|snap"
-                android:background="@color/lightgray">
+                android:background="@color/lightgray"
+                app:layout_scrollFlags="scroll|snap">
 
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingTop="18dp"
                     android:paddingBottom="18dp">
+
                 <TextView
                         android:id="@+id/tv_balance"
+                        style="@style/profile_balance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/balance"
-                        style="@style/profile_balance"
                         android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"/>
+                        android:layout_centerVertical="true"
+                        android:text="@string/balance" />
             </RelativeLayout>
 
 
@@ -39,9 +40,16 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:id="@+id/profile_fragment_host"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <fragment
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.android.carrent.fragments.profile.ProfilePreferenceFragment" />
+
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
