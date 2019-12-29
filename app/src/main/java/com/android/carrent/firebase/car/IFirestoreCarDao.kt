@@ -1,4 +1,4 @@
-package com.android.carrent.firestore.car
+package com.android.carrent.firebase.car
 
 import com.android.carrent.models.Car.Car
 import com.google.firebase.firestore.CollectionReference

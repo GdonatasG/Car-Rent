@@ -19,6 +19,10 @@
     <string name="error_no_internet">No internet connection!</string>
     <string name="snackbar_action_close">OK</string>
     <string name="filter_dialog_title">Filter cars</string>
+    <string name="verification_sent">A verification link has been sent to</string>
+    <string name="verification_error">We can`t send you email verification link to</string>
+    <string name="not_verified">Check your email to verify your account</string>
+    <string name="error_no_user">You are not logged in!</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>
@@ -27,6 +31,9 @@
     <string name="hint_confirm_password">Confirm password</string>
     <string name="hint_phone_number">Enter phone number</string>
     <string name="searchview_hint">Model, plate number, city or street</string>
+    <string name="hint_enter_current_pass">Enter current password</string>
+    <string name="hint_enter_new_pass">Enter new password</string>
+    <string name="hint_repeat_new_pass">Repeat new password</string>
 
     <!-- Navigation drawer, other menus -->
     <string name="title_activity_home">HomeActivity</string>
@@ -34,28 +41,39 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_welcome">Welcome,</string>
     <string name="nav_header_balance">69 €</string>
-    <string name="balance">Balance: 69 €</string>
+    <string name="balance">Balance: </string>
     <string name="nav_header_currency_euro">€</string>
     <string name="nav_header_guest">Guest</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Profile Fragment -->
+    <string name="profile">profile</string>
 
     <!-- Profile preferences -->
     <string name="KEY_MY_CAR">MY_CAR</string>
     <string name="my_car_title">My car</string>
     <string name="my_car_summary">View your car in details</string>
 
+    <string name="KEY_ADD_FUNDS">ADD_FUNDS</string>
+    <string name="add_funds_title">Add funds</string>
+    <string name="add_funds_summary">Add funds into your balance</string>
+
     <string name="KEY_EDIT_PROFILE">EDIT_PROFILE</string>
     <string name="edit_profile_title">Edit your profile</string>
     <string name="edit_profile_summary">Change username, phone number</string>
 
-    <string name="KEY_CHANGE_PASSWORD">CHANGE_PASSWORD</string>
-    <string name="change_password_title">Change password</string>
-    <string name="change_password_summary">Change your password</string>
-
     <string name="KEY_LOGOUT">LOGOUT</string>
     <string name="logout_title">Logout</string>
     <string name="logout_summary">Logout from your current account</string>
+
+    <string name="rented_until">Rented until:</string>
+
+    <!-- EditProfile -->
+    <string name="confirm">Confirm</string>
+    <string name="PROFILE_UPDATED">Updated!</string>
+    <string name="PASSWORD_UPDATE_ERROR">An error occurred while updating password!</string>
+    <string name="ERROR_WRONG_PASS">You may entered wrong password!</string>
 
     <!-- Toolbar -->
     <string name="show_all">Show all</string>

@@ -1,4 +1,4 @@
-package com.android.carrent.firestore.user
+package com.android.carrent.firebase.user
 
 import com.android.carrent.models.User.User
 import com.google.firebase.firestore.DocumentReference

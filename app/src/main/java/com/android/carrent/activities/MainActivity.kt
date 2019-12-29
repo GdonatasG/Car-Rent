@@ -16,7 +16,6 @@ import com.android.carrent.utils.MapServiceGpsRequests
 import com.android.carrent.utils.extensions.mainSnackbarView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -29,8 +28,6 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
     private var snackbar: Snackbar? = null
     private var connectivityReceiver: ConnectivityReceiver = ConnectivityReceiver()
 
-    // Firebase
-    private var mAuth: FirebaseAuth? = null
     // MapServiceGpsRequests
     private lateinit var mMapServiceGpsRequests: MapServiceGpsRequests
 
@@ -47,16 +44,11 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         )
 
-        // Init firebase
-        mAuth = FirebaseAuth.getInstance()
-
         // Init MapServiceGpsRequests
         mMapServiceGpsRequests = MapServiceGpsRequests(this)
 
         // Init toolbar
         setSupportActionBar(toolbar as Toolbar)
-
-        //bottom_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         if (savedInstanceState == null && mMapServiceGpsRequests.isServicesOk()) {
             setFragment(fragment = HomeFragment())
@@ -68,7 +60,6 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
 
     override fun onNetworkConnectionChanged(isConnected: Boolean) {
         isInternetOn = isConnected
-        println("CONNECTION CHANGED TO: ${isInternetOn}")
         showNetworkMessage()
     }
 

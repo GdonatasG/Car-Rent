@@ -11,8 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.android.carrent.R
-import com.android.carrent.firestore.car.FirestoreCarRepository
-import com.android.carrent.firestore.user.FirestoreUserRepository
+import com.android.carrent.firebase.car.FirestoreCarRepository
+import com.android.carrent.firebase.user.FirestoreUserRepository
 import com.android.carrent.models.Car.Car
 import com.android.carrent.models.ClusterMarker
 import com.android.carrent.models.User.User

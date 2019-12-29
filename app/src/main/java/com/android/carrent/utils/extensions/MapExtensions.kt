@@ -34,9 +34,9 @@ fun setCameraViewWBounds(googleMap: GoogleMap, bounds: LatLngBounds) {
 }
 
 @SuppressLint("MissingPermission")
-fun enableDeviceLocationWButton(googleMap: GoogleMap) {
-    googleMap.isMyLocationEnabled = true
-    googleMap.uiSettings.isMyLocationButtonEnabled = true
+fun enableDeviceLocationWButton(googleMap: GoogleMap?) {
+    googleMap?.isMyLocationEnabled = true
+    googleMap?.uiSettings?.isMyLocationButtonEnabled = true
 }
 
 fun getDistance(lat1: Double?, lon1: Double?, lat2: Double?, lon2: Double?): Double {
