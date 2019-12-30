@@ -43,6 +43,6 @@ object Constants {
     val BUNDLE_KEY_CAR_ID = "CAR_ID"
 
     // Date and time formats
-    var DATE_FORMAT = SimpleDateFormat("dd.MM.YYYY, HH:mm", Locale.getDefault())
+    var DATE_FORMAT = SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.getDefault())
 
 }
