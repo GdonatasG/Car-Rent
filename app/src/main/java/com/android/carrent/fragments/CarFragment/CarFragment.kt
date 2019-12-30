@@ -38,6 +38,7 @@ import com.android.carrent.models.User.User
 import com.android.carrent.utils.constants.Constants.DATE_FORMAT
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import kotlinx.android.synthetic.main.car_rent_layout.view.*
 import java.util.*
 import java.util.concurrent.TimeUnit
