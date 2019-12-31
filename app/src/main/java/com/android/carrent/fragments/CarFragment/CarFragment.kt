@@ -38,7 +38,6 @@ import com.android.carrent.models.User.User
 import com.android.carrent.utils.constants.Constants.DATE_FORMAT
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FieldValue
 import kotlinx.android.synthetic.main.car_rent_layout.view.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -78,7 +77,13 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private var totalRentSum: Float = 0F
     // Minimum time of rent in milliseconds
     private var MINIMUM_RENT_TIME =
-        1 * HOUR_TO_MILLIS - TimeUnit.SECONDS.toMillis(40) // Few minutes are given for user to make a decision
+        1 * HOUR_TO_MILLIS - TimeUnit.SECONDS.toMillis(40) // Some time given to user to make a decision
+
+    // Car Rent Dialog
+    private lateinit var dialog: AlertDialog
+    private lateinit var dpd: DatePickerDialog
+    private lateinit var tpd: TimePickerDialog
+
 
     val selectedDate = Calendar.getInstance()
 
@@ -143,14 +148,27 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private fun loadCar(id: Int?) {
         viewModel.getCarById(id).observe(viewLifecycleOwner, Observer<Car> {
             car.value = it
-
-            setToolbarTitle(it.model.title)
-            loadCarImage(it.model.photoUrl)
-            setUpCarMainDetails(it)
-            setUpCarConsumption(it)
-            setUpCarLocation(it)
-            setUpRentButton(it.rent.rented)
+            if (car.value == null) {
+                makeToast(resources.getString(R.string.ERROR_NO_CAR))
+                // Removing dialog
+                clearFragmentContentWhenRemoving()
+                clearBackStack()
+                removeFragment(this)
+            } else {
+                setToolbarTitle(it.model.title)
+                loadCarImage(it.model.photoUrl)
+                setUpCarMainDetails(it)
+                setUpCarConsumption(it)
+                setUpCarLocation(it)
+                setUpRentButton(it.rent.rented)
+            }
         })
+    }
+
+    private fun clearFragmentContentWhenRemoving() {
+        if (::dialog.isInitialized && dialog.isShowing) dialog.dismiss()
+        if (::dpd.isInitialized && dpd.isShowing) dpd.dismiss()
+        if (::tpd.isInitialized && tpd.isShowing) tpd.dismiss()
     }
 
     private fun loadCarImage(url: String?) {
@@ -333,7 +351,6 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     }
 
     private fun performRent() {
-        lateinit var dialog: AlertDialog
 
         val layout = LinearLayout(mContext)
         val v = layoutInflater.inflate(R.layout.car_rent_layout, null)
@@ -369,7 +386,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                 // Must have enough money in the balance
                 if ((activity as MainActivity).isInternetOn) {
                     mAuth.currentUser?.reload()
-                    if (mAuth.currentUser != null) {
+                    if (mAuth.currentUser != null && user.value != null) {
                         if (areRequirementsMet()) {
                             if (!isRentedOrHaveRented()) {
                                 totalRentSum = totalRentSum()
@@ -377,23 +394,37 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                                     val rentStarted = Timestamp(Calendar.getInstance().time)
                                     val rentedUntil = Timestamp(selectedDate.time)
 
-                                    // Updating user
+                                    // Updating user object values
                                     user.value?.rent?.hasCar = true
                                     user.value?.rent?.rentedCarId = car.value?.id
                                     user.value?.rent?.rentStarted = rentStarted
                                     user.value?.rent?.rentedUntil = rentedUntil
                                     user.value?.balance = user.value?.balance!! - totalRentSum
-                                    viewModel.updateUser(user.value)
 
-                                    // Updating car
+                                    // Updating car object values
                                     car.value?.rent?.rented = true
                                     car.value?.rent?.rentStarted = rentStarted
                                     car.value?.rent?.rentedUntil = rentedUntil
                                     car.value?.rent?.rentedById = user.value?.id
-                                    viewModel.updateCar(car.value)
 
-                                    // Start CarManagement fragment (SOON)
+                                    // Car will be rented if User && Car already exists in Firestore Collections
+                                    viewModel.getCarRef(car.value?.id).get().addOnCompleteListener {
+                                        if (it.result?.exists()!!) {
+                                            viewModel.getUserRef(user.value?.id!!).get()
+                                                .addOnCompleteListener { u ->
+                                                    if (u.result?.exists()!!) {
+                                                        viewModel.getUserRef(user.value?.id!!)
+                                                            .set(user.value!!)
+                                                        viewModel.getCarRef(car.value?.id)
+                                                            .set(car.value!!)
 
+                                                        // Start CarManagementFragment (SOON)
+                                                        makeToast("CAR RENTED / TOAST WILL BE DELETED.")
+
+                                                    } else makeToast("ERROR NO USER / DELETE SOON")
+                                                }
+                                        } else makeToast("ERROR NO CAR / DELETE SOON")
+                                    }
 
                                 } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_MONEY))
                             } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR))
@@ -411,14 +442,14 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         }
 
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
-            val dpd = DatePickerDialog(
+            dpd = DatePickerDialog(
                 mContext,
                 DatePickerDialog.OnDateSetListener { view, i, i2, i3 ->
                     selectedDate.set(Calendar.YEAR, i)
                     selectedDate.set(Calendar.MONTH, i2)
                     selectedDate.set(Calendar.DAY_OF_MONTH, i3)
                     isDateSelected = true
-                    val tp = TimePickerDialog(
+                    tpd = TimePickerDialog(
                         mContext,
                         TimePickerDialog.OnTimeSetListener { timePicker, j, j2 ->
                             selectedDate.set(Calendar.HOUR_OF_DAY, j)
@@ -435,7 +466,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                         selectedDate.get(Calendar.MINUTE),
                         true
                     )
-                    tp.show()
+                    tpd.show()
                 },
                 selectedDate.get(Calendar.YEAR),
                 selectedDate.get(Calendar.MONTH),
@@ -450,7 +481,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     }
 
     private fun isRentedOrHaveRented(): Boolean {
-        return car.value?.rent?.rented!! || user.value?.rent?.hasCar!!
+        return if (car.value != null && user.value != null) car.value?.rent?.rented!! || user.value?.rent?.hasCar!!
+        else false
     }
 
     private fun totalRentSum(): Float {
@@ -592,6 +624,9 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     }
 
     override fun onPause() {
+        shouldShowHomeButton(activity, false)
+        // Clearing title of toolbar
+        setToolbarTitle("")
         mMap.onPause()
         super.onPause()
     }

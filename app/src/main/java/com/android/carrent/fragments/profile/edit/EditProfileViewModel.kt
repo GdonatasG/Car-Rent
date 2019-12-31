@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.carrent.firebase.user.FirestoreUserRepository
 import com.android.carrent.models.User.User
+import com.google.firebase.firestore.DocumentReference
 
 class EditProfileViewModel : ViewModel() {
     private val TAG: String = "EditProfileViewModel"
@@ -24,6 +25,7 @@ class EditProfileViewModel : ViewModel() {
                     val u = snapshot.toObject(User::class.java)
                     user.value = u
                 } else {
+                    user.value = null
                     Log.d(TAG, "getUser: Snapshot data: null")
                 }
             }
@@ -31,8 +33,8 @@ class EditProfileViewModel : ViewModel() {
         return user
     }
 
-    fun updateUser(user: User?) {
-        userRepository.updateUser(user)
+    fun getUserRef(uid: String): DocumentReference {
+        return userRepository.getUser(uid)
     }
 
 

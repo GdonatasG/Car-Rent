@@ -28,6 +28,7 @@ class ProfileViewModel : ViewModel() {
                     val u = snapshot.toObject(User::class.java)
                     user.value = u
                 } else {
+                    user.value = null
                     Log.d(TAG, "getUser: Snapshot data: null")
                 }
             }
@@ -46,7 +47,10 @@ class ProfileViewModel : ViewModel() {
                 if (snapshot != null && snapshot.exists()) {
                     val c = snapshot.toObject(Car::class.java)
                     car.value = c
-                } else Log.d(TAG, "getCar: Snapshot data: null")
+                } else {
+                    car.value = null
+                    Log.d(TAG, "getCar: Snapshot data: null")
+                }
             }
 
         return car

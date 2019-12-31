@@ -19,6 +19,7 @@ import com.android.carrent.models.User.User
 import com.android.carrent.utils.ClusterManagerRenderer
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.DocumentReference
 import com.google.maps.android.clustering.ClusterManager
 
 class CarFragmentViewModel : ViewModel() {
@@ -46,6 +47,7 @@ class CarFragmentViewModel : ViewModel() {
                     val c = snapshot.toObject(Car::class.java)
                     car.value = c
                 } else {
+                    car.value = null
                     Log.d(TAG, "getCarById: Snapshot data: null")
                 }
 
@@ -66,18 +68,19 @@ class CarFragmentViewModel : ViewModel() {
                     val u = snapshot.toObject(User::class.java)
                     user.value = u
                 } else {
+                    user.value = null
                     Log.d(TAG, "getUser: Snapshot data: null")
                 }
             }
         return user
     }
 
-    fun updateUser(user: User?) {
-        userRepository.updateUser(user)
+    fun getCarRef(id: Int?): DocumentReference {
+        return carRepository.getCarById(id)
     }
 
-    fun updateCar(car: Car?) {
-        carRepository.updateCar(car)
+    fun getUserRef(uid: String): DocumentReference {
+        return userRepository.getUser(uid)
     }
 
     fun handleExpandableView(expandableView: View?, cardView: ViewGroup?, arrowButton: Button?) {

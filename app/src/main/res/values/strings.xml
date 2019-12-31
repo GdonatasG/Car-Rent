@@ -22,7 +22,8 @@
     <string name="verification_sent">A verification link has been sent to</string>
     <string name="verification_error">We can`t send you email verification link to</string>
     <string name="not_verified">Check your email to verify your account</string>
-    <string name="error_no_user">You are not logged in!</string>
+    <string name="error_not_logged">You are not logged in!</string>
+    <string name="error_user_not_found">User not found!</string>
 
     <!--EditText Hints-->
     <string name="hint_username">Enter username</string>
@@ -86,6 +87,7 @@
     <string name="CAR_RENT_TWICE_CLICK">Click again to confirm rent</string>
 
     <string name="ERROR_AUTH_REQUIRED">Authentication is needed for this action!</string>
+    <string name="ERROR_NO_CAR">This car no longer exists!</string>
 
     <string name="car_rent_period">Select rent time</string>
     <string name="car_rent_date">Selected to rent until:</string>
