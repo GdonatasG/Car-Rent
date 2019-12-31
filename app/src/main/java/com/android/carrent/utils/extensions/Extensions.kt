@@ -88,7 +88,7 @@ fun Fragment.noUserRemoveFragment(fragment: Fragment, showMessage: Boolean = tru
     FirebaseAuth.getInstance().signOut()
     clearBackStack()
     removeFragment(fragment)
-    if (showMessage) makeToast(resources.getString(R.string.error_no_user))
+    if (showMessage) makeToast(resources.getString(R.string.error_not_logged))
 
 }
 
@@ -96,7 +96,7 @@ fun Fragment.noUserGoToLogin(view: Int) {
     FirebaseAuth.getInstance().signOut()
     clearBackStack()
     changeFragment(view, LoginFragment())
-    makeToast(resources.getString(R.string.error_no_user))
+    makeToast(resources.getString(R.string.error_not_logged))
 }
 
 

@@ -92,7 +92,7 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(),
     private fun loadUser(uid: String?) {
         uid?.let {
             viewModel.getUser(uid).observe(this, Observer<User> { u ->
-                updatePreferences(u)
+                if (u != null) updatePreferences(u)
             })
         }
     }

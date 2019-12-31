@@ -78,8 +78,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
         uid?.let {
             viewModel.getUser(it).observe(viewLifecycleOwner, Observer<User> { u ->
                 user.value = u
-                setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
-                loadInputs(u)
+                if (u != null) {
+                    setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
+                    loadInputs(u)
+                } else noUserRemoveFragment(fragment = this, showMessage = false)
             })
         }
     }
@@ -138,24 +140,32 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                 )?.addOnCompleteListener {
                     if (it.isSuccessful) {
                         // Updating user record in Firestore
-                        viewModel.updateUser(user.value)
+                        viewModel.getUserRef(user.value?.id!!).get().addOnCompleteListener {
+                            if (it.result?.exists()!!) {
+                                viewModel.getUserRef(user.value?.id!!).set(user.value!!)
 
-                        // Updating password
-                        if (et_new_password.text.isNotEmpty()) {
-                            mAuth.currentUser?.updatePassword(et_new_password.text.toString())
-                                ?.addOnCompleteListener {
+                                // Updating password
+                                if (et_new_password.text.isNotEmpty()) {
+                                    mAuth.currentUser?.updatePassword(et_new_password.text.toString())
+                                        ?.addOnCompleteListener {
+                                            progressDialog.dismiss()
+                                            if (it.isSuccessful) {
+                                                clearPasswordInputs()
+                                                makeToast(resources.getString(R.string.PROFILE_UPDATED))
+                                            } else {
+                                                makeToast(it.exception?.message.toString())
+                                            }
+                                        }
+                                } else {
                                     progressDialog.dismiss()
-                                    if (it.isSuccessful) {
-                                        clearPasswordInputs()
-                                        makeToast(resources.getString(R.string.PROFILE_UPDATED))
-                                    } else {
-                                        makeToast(resources.getString(R.string.PASSWORD_UPDATE_ERROR))
-                                    }
+                                    clearPasswordInputs()
+                                    makeToast(resources.getString(R.string.PROFILE_UPDATED))
                                 }
-                        } else {
-                            progressDialog.dismiss()
-                            clearPasswordInputs()
-                            makeToast(resources.getString(R.string.PROFILE_UPDATED))
+                            } else {
+                                progressDialog.dismiss()
+                                clearPasswordInputs()
+                                makeToast(resources.getString(R.string.error_user_not_found))
+                            }
                         }
 
                     } else {

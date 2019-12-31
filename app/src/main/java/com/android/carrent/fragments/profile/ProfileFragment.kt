@@ -72,9 +72,12 @@ class ProfileFragment : Fragment() {
         uid?.let {
             viewModel.getUser(it).observe(viewLifecycleOwner, Observer<User> { u ->
                 user.value = u
+                if (u != null) {
+                    setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
+                    updateUserBalance(u.balance)
+                } else noUserRemoveFragment(this)
 
-                setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
-                updateUserBalance(u.balance)
+
             })
         }
     }
@@ -95,9 +98,13 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onAttach(context: Context) {
-        shouldShowHomeButton(activity, true)
         mContext = context
         super.onAttach(context)
+    }
+
+    override fun onResume() {
+        shouldShowHomeButton(activity, true)
+        super.onResume()
     }
 
     override fun onStart() {
