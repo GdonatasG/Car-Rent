@@ -2,6 +2,7 @@ package com.android.carrent.fragments.CarFragment
 
 
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -84,6 +85,9 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private lateinit var dpd: DatePickerDialog
     private lateinit var tpd: TimePickerDialog
 
+    // ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
+
 
     val selectedDate = Calendar.getInstance()
 
@@ -120,6 +124,10 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         val bundle = arguments
         CAR_ID = bundle?.getInt(BUNDLE_KEY_CAR_ID)
 
+        // Init progress dialog
+        progressDialog = ProgressDialog(mContext, R.style.progress_dialog_bar)
+        modifyProgressDialog(progressDialog)
+
         // On-clicks
         mView?.car_main_details?.arrowBtnCarMain?.setOnClickListener(this)
         mView?.car_fuel_consumption?.arrowBtnCarFuelConsumption?.setOnClickListener(this)
@@ -152,8 +160,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                 makeToast(resources.getString(R.string.ERROR_NO_CAR))
                 // Removing dialog
                 clearFragmentContentWhenRemoving()
-                clearBackStack()
-                removeFragment(this)
+                activity?.supportFragmentManager?.popBackStack()
+                //removeFragment(this)
             } else {
                 setToolbarTitle(it.model.title)
                 loadCarImage(it.model.photoUrl)
@@ -335,7 +343,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
             com.android.carrent.R.id.btn_rent -> {
                 mAuth.currentUser?.reload()
                 if (mAuth.currentUser == null) {
-                    noUserGoToLogin(view = R.id.container_host)
+                    noUserGoToLogin(view = R.id.container_host, context = mContext)
                 } else {
                     if (isRentedOrHaveRented()) makeToast(
                         resources.getString(
@@ -386,6 +394,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                 // Must have enough money in the balance
                 if ((activity as MainActivity).isInternetOn) {
                     mAuth.currentUser?.reload()
+                    progressDialog.show()
                     if (mAuth.currentUser != null && user.value != null) {
                         if (areRequirementsMet()) {
                             if (!isRentedOrHaveRented()) {
@@ -418,20 +427,37 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                                                         viewModel.getCarRef(car.value?.id)
                                                             .set(car.value!!)
 
+                                                        progressDialog.dismiss()
                                                         // Start CarManagementFragment (SOON)
                                                         makeToast("CAR RENTED / TOAST WILL BE DELETED.")
 
-                                                    } else makeToast("ERROR NO USER / DELETE SOON")
+                                                    } else {
+                                                        progressDialog.dismiss()
+                                                        makeToast("ERROR NO USER / DELETE SOON")
+                                                    }
                                                 }
-                                        } else makeToast("ERROR NO CAR / DELETE SOON")
+                                        } else {
+                                            progressDialog.dismiss()
+                                            makeToast("ERROR NO CAR / DELETE SOON")
+                                        }
                                     }
 
-                                } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_MONEY))
-                            } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR))
-                        } else makeToast(resources.getString(R.string.CAR_RENT_ERROR_REQUIREMENTS_NOT_MET))
+                                } else {
+                                    progressDialog.dismiss()
+                                    makeToast(resources.getString(R.string.CAR_RENT_ERROR_MONEY))
+                                }
+                            } else {
+                                progressDialog.dismiss()
+                                makeToast(resources.getString(R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR))
+                            }
+                        } else {
+                            progressDialog.dismiss()
+                            makeToast(resources.getString(R.string.CAR_RENT_ERROR_REQUIREMENTS_NOT_MET))
+                        }
                     } else {
                         dialog.dismiss()
-                        noUserGoToLogin(view = R.id.container_host)
+                        progressDialog.dismiss()
+                        noUserGoToLogin(view = R.id.container_host, context = mContext)
                     }
                 } else (activity as MainActivity).showNetworkMessage()
             } else makeToast(resources.getString(R.string.CAR_RENT_TWICE_CLICK))
@@ -597,6 +623,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     }
 
     override fun onResume() {
+        (activity as MainActivity).enabledWidgets()
+        shouldShowHomeButton(activity, true)
         mMap.onResume()
         super.onResume()
     }

@@ -1,6 +1,8 @@
 package com.android.carrent.fragments.authentication
 
 
+import android.app.ProgressDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -8,10 +10,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
-import com.android.carrent.fragments.HomeFragment.HomeFragment
+import com.android.carrent.utils.constants.Constants.BACKSTACK_LOGIN_FRAGMENT
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_login.view.*
 import com.android.carrent.utils.extensions.*
@@ -23,16 +26,16 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
     private lateinit var mAuth: FirebaseAuth
 
-    // Variable to disable action while logging in
-    private var disabledWhileLogin = false
+    // Context (to ensure that not null)
+    private lateinit var mContext: Context
+
+    // ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mAuth = FirebaseAuth.getInstance()
-
-        // Disable widgets
-        (activity as MainActivity).disableWidgets()
     }
 
     override fun onCreateView(
@@ -40,9 +43,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        var v: View = inflater.inflate(R.layout.fragment_login, container, false)
-
-        setLogoAndFormFadeIn(context!!, v.iv_logo, v.login_form)
+        val v: View = inflater.inflate(R.layout.fragment_login, container, false)
 
         v.btn_login.setOnClickListener(this)
 
@@ -52,6 +53,12 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
         v.tv_forgot_password.setOnClickListener(this)
 
+        (activity as MainActivity).disableWidgets()
+
+        // Init progress dialog
+        progressDialog = ProgressDialog(mContext, R.style.progress_dialog_bar)
+        modifyProgressDialog(progressDialog)
+
         return v
     }
 
@@ -59,25 +66,27 @@ class LoginFragment : Fragment(), View.OnClickListener {
         when (v?.id) {
             R.id.btn_login -> {
                 Log.d(TAG, "Clicked on login button")
-                if (!disabledWhileLogin) doValidations()
+                doValidations()
             }
 
             R.id.tv_continue_as_guest -> {
-                changeFragment(R.id.container_host, fragment = HomeFragment())
+                activity?.supportFragmentManager?.popBackStack(
+                    BACKSTACK_LOGIN_FRAGMENT,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE
+                )
             }
 
             R.id.tv_goto_register -> {
                 Log.d(TAG, "Clicked on register textview")
-                if (!disabledWhileLogin) {
-                    changeFragment(R.id.container_host, fragment = RegisterFragment())
-                }
+                addFragmentWithBackStack(
+                    view = R.id.container_host,
+                    fragment = RegisterFragment(),
+                    tag = BACKSTACK_LOGIN_FRAGMENT
+                )
             }
 
             R.id.tv_forgot_password -> {
                 Log.d(TAG, "Clicked on forgot password textview")
-                if (!disabledWhileLogin) {
-
-                }
             }
         }
     }
@@ -90,9 +99,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             et_password.error = resources.getString(R.string.hint_password)
             et_password.requestFocus()
         } else {
-            // Login user
-            disabledWhileLogin = true
-            showProgressBar(progress_bar)
+            progressDialog.show()
             login(et_email.text.toString(), et_password.text.toString())
 
         }
@@ -103,23 +110,40 @@ class LoginFragment : Fragment(), View.OnClickListener {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     if (mAuth.currentUser?.isEmailVerified!!) {
-                        Log.d(TAG, "User logged in, starting HomeFragment")
-                        changeFragment(R.id.container_host, fragment = HomeFragment())
+                        Log.d(TAG, "User logged in")
+                        progressDialog.dismiss()
+                        activity?.supportFragmentManager?.popBackStack(
+                            BACKSTACK_LOGIN_FRAGMENT,
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE
+                        )
                     } else {
                         mAuth.signOut()
+                        progressDialog.dismiss()
                         makeToast(resources.getString(R.string.not_verified))
-                        disabledWhileLogin = false
-                        hideProgressBar(progress_bar)
                     }
 
                 } else {
                     Log.d(TAG, "Something went wrong when logging in")
+                    progressDialog.dismiss()
                     makeToast(it.exception?.message.toString())
-                    disabledWhileLogin = false
-                    hideProgressBar(progress_bar)
                 }
             }
 
 
+    }
+
+    override fun onAttach(context: Context) {
+        mContext = context
+        super.onAttach(context)
+    }
+
+    override fun onResume() {
+        (activity as MainActivity).disableWidgets()
+        super.onResume()
+    }
+
+    override fun onDetach() {
+        (activity as MainActivity).enabledWidgets()
+        super.onDetach()
     }
 }

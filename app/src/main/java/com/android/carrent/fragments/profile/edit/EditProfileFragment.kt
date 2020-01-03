@@ -81,7 +81,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                 if (u != null) {
                     setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
                     loadInputs(u)
-                } else noUserRemoveFragment(fragment = this, showMessage = false)
+                } else noUserPopProfileFragments(context = context)
             })
         }
     }
@@ -98,11 +98,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                 if ((activity as MainActivity).isInternetOn) {
                     mAuth.currentUser?.reload()
                     if (mAuth.currentUser != null) updateCurrentUser()
-                    else {
-                        // ProfileFragment is still in the background
-                        // Message that user is not logged in will appear from ProfileFragment AuthStateListener
-                        noUserRemoveFragment(fragment = this, showMessage = false)
-                    }
+                    else noUserPopProfileFragments(context = context)
                 } else (activity as MainActivity).showNetworkMessage()
             }
         }
@@ -174,9 +170,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                     }
                 }
             } else {
-                // ProfileFragment is still in the background
-                // Message that user is not logged in will appear from ProfileFragment AuthStateListener
-                noUserRemoveFragment(fragment = this, showMessage = false)
+                noUserPopProfileFragments(context = context)
             }
         }
 

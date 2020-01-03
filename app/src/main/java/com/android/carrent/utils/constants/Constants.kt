@@ -7,10 +7,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object Constants {
-    // FadeIn durations
-    val LOGO_ANIMATION_DURATION: Long = 800
-    val FORM_ANIMATION_DURATION: Long = 1700
-
     // Firestore
     val FIRESTORE_USERS_REFERENCE: String = "users"
     val FIRESTORE_CARS_REFERENCE: String = "cars"
@@ -38,6 +34,8 @@ object Constants {
     val BACKSTACK_PROFILE_FRAGMENT = "BACKSTACK_PROFILE_FRAGMENT"
     val BACKSTACK_CAR_FRAGMENT = "BACKSTACK_CAR_FRAGMENT"
     val BACKSTACK_EDIT_PROFILE_FRAGMENT = "BACKSTACK_EDIT_PROFILE_FRAGMENT"
+    val BACKSTACK_LOGIN_FRAGMENT = "BACKSTACK_LOGIN_FRAGMENT"
+    val BACKSTACK_REGISTER_FRAGMENT = "BACKSTACK_REGISTER_FRAGMENT"
 
     // Bundle keys
     val BUNDLE_KEY_CAR_ID = "CAR_ID"

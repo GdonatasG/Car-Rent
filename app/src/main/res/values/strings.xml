@@ -50,6 +50,7 @@
 
     <!-- Profile Fragment -->
     <string name="profile">profile</string>
+    <string name="message_logged_out">You have been logged out</string>
 
     <!-- Profile preferences -->
     <string name="KEY_MY_CAR">MY_CAR</string>

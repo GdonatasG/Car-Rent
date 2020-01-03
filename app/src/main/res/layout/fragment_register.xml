@@ -1,124 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragment_register"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/fragment_register"
         android:background="@color/colorPrimaryDark"
-        tools:context=".fragments.authentication.RegisterFragment"
         android:fillViewport="true"
+        android:orientation="vertical"
         android:paddingTop="12dp"
         android:paddingBottom="15dp"
-        android:scrollbarStyle="outsideOverlay">
+        android:scrollbarStyle="outsideOverlay"
+        tools:context=".fragments.authentication.RegisterFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:paddingLeft="20dp"
+            android:paddingTop="50dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="50dp">
 
         <ImageView
                 android:id="@+id/iv_logo"
-                style="@style/iv_logo"/>
+                style="@style/iv_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-                android:id="@+id/register_form"
+        <EditText
+                android:id="@+id/et_username"
+                style="@style/EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_person_lightgray_24dp"
+                android:hint="@string/hint_username"
+                android:inputType="textPersonName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_logo" />
+
+        <EditText
+                android:id="@+id/et_email"
+                style="@style/EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_email_lightgray_24dp"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_username" />
+
+
+        <EditText
+                android:id="@+id/et_password"
+                style="@style/EditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_lock_lightgray_24dp"
+                android:hint="@string/hint_password"
+                android:inputType="textPassword"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_email" />
+
+        <EditText
+                android:id="@+id/et_password_confirm"
+                style="@style/EditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:padding="20dp"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:focusable="false"
-                android:focusableInTouchMode="true">
+                android:drawableStart="@drawable/ic_lock_lightgray_24dp"
+                android:hint="@string/hint_confirm_password"
+                android:inputType="textPassword"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
-            <EditText
-                    android:id="@+id/et_username"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_username"
-                    android:drawableLeft="@drawable/ic_person_lightgray_24dp"
-                    android:inputType="textPersonName"/>
+        <EditText
+                android:id="@+id/et_phone"
+                style="@style/EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_phone_lightgray_24dp"
+                android:hint="@string/hint_phone_number"
+                android:inputType="phone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_password_confirm" />
 
-            <EditText
-                    android:id="@+id/et_email"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_email"
-                    android:drawableLeft="@drawable/ic_email_lightgray_24dp"
-                    android:inputType="textEmailAddress"/>
+        <Button
+                android:id="@+id/btn_register"
+                style="@style/button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/register"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_phone" />
 
+        <TextView
+                android:id="@+id/tv_continue_as_guest"
+                style="@style/TextSecondOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/continue_as_guest"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_register" />
 
-            <EditText
-                    android:id="@+id/et_password"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_password"
-                    android:drawableLeft="@drawable/ic_lock_lightgray_24dp"
-                    android:inputType="textPassword"/>
+        <TextView
+                android:id="@+id/tv_goto_login"
+                style="@style/TextSecondOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="@string/already_registered"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_continue_as_guest" />
 
-            <EditText
-                    android:id="@+id/et_password_confirm"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_confirm_password"
-                    android:drawableLeft="@drawable/ic_lock_lightgray_24dp"
-                    android:inputType="textPassword"/>
-
-            <EditText
-                    android:id="@+id/et_phone"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_phone_number"
-                    android:drawableLeft="@drawable/ic_phone_lightgray_24dp"
-                    android:inputType="phone"/>
-
-            <ProgressBar
-                    android:id="@+id/progress_bar"
-                    style="@style/progress_bar"/>
-
-            <Button
-                    android:id="@+id/btn_register"
-                    style="@style/button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/register"/>
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="@dimen/second_options_layout_margin">
-
-                <TextView
-                        android:id="@+id/tv_continue_as_guest"
-                        style="@style/TextSecondOptions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/continue_as_guest"/>
-
-                <TextView
-                        android:id="@+id/tv_goto_login"
-                        style="@style/TextSecondOptions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/already_registered"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </ScrollView>

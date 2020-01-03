@@ -1,6 +1,8 @@
 package com.android.carrent.fragments.authentication
 
 
+import android.app.ProgressDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -9,28 +11,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
-import com.android.carrent.fragments.HomeFragment.HomeFragment
 import com.android.carrent.models.User.Rent
 import com.android.carrent.models.User.User
 import com.android.carrent.utils.constants.Constants
+import com.android.carrent.utils.constants.Constants.BACKSTACK_LOGIN_FRAGMENT
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_register.*
 import kotlinx.android.synthetic.main.fragment_register.view.*
-import kotlinx.android.synthetic.main.fragment_register.view.iv_logo
 import kotlinx.android.synthetic.main.fragment_register.view.tv_continue_as_guest
 
 class RegisterFragment : Fragment(), View.OnClickListener {
     private val TAG: String = "RegisterFragment"
 
-    // Variable to disable action while register
-    private var disabledWhileRegister = false
-
     private lateinit var mAuth: FirebaseAuth
+
+    // Context (to ensure that not null)
+    private lateinit var mContext: Context
+
+    // ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +52,17 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var v: View = inflater.inflate(R.layout.fragment_register, container, false)
-
-        setLogoAndFormFadeIn(context!!, v.iv_logo, v.register_form)
+        val v: View = inflater.inflate(R.layout.fragment_register, container, false)
 
         v.btn_register.setOnClickListener(this)
 
         v.tv_continue_as_guest.setOnClickListener(this)
 
         v.tv_goto_login.setOnClickListener(this)
+
+        // Init progress dialog
+        progressDialog = ProgressDialog(mContext, R.style.progress_dialog_bar)
+        modifyProgressDialog(progressDialog)
 
         return v
     }
@@ -63,17 +71,18 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         when (view?.id) {
             R.id.btn_register -> {
-                if (!disabledWhileRegister) doValidations()
+                doValidations()
             }
 
             R.id.tv_continue_as_guest -> {
-                changeFragment(R.id.container_host, fragment = HomeFragment())
+                activity?.supportFragmentManager?.popBackStack(
+                    BACKSTACK_LOGIN_FRAGMENT,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE
+                )
             }
 
             R.id.tv_goto_login -> {
-                if (!disabledWhileRegister) {
-                    changeFragment(R.id.container_host, fragment = LoginFragment())
-                }
+                activity?.supportFragmentManager?.popBackStack()
             }
         }
     }
@@ -91,7 +100,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         } else if (et_password_confirm.text.isEmpty()) {
             et_password_confirm.error = resources.getString(R.string.hint_confirm_password)
             et_password_confirm.requestFocus()
-        } else if (!et_password.text.toString().equals(et_password_confirm.text.toString())) {
+        } else if (et_password.text.toString() != et_password_confirm.text.toString()) {
             et_password.error = resources.getString(R.string.passwords_no_match)
             et_password.requestFocus()
         } else if (et_phone.text.isEmpty()) {
@@ -100,8 +109,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         } else {
             // Register user
             Log.d(TAG, "Validations are done")
-            disabledWhileRegister = true
-            showProgressBar(progress_bar)
+            progressDialog.show()
             register(
                 et_username.text.toString(),
                 et_email.text.toString(),
@@ -139,20 +147,18 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                                 Log.d(TAG, "User added into firestore!")
                                 if (!mAuth.currentUser?.isEmailVerified!!) {
                                     sendVerification()
-                                } else changeFragment(
-                                    R.id.container_host,
-                                    fragment = HomeFragment()
-                                )
+                                } else {
+                                    progressDialog.dismiss()
+                                    activity?.supportFragmentManager?.popBackStack()
+                                }
                             } else {
+                                progressDialog.dismiss()
                                 makeToast(it.exception?.message.toString())
-                                hideProgressBar(progress_bar)
-                                disabledWhileRegister = false
                             }
                         }
                 } else {
+                    progressDialog.dismiss()
                     makeToast(it.exception?.message.toString())
-                    hideProgressBar(progress_bar)
-                    disabledWhileRegister = false
                 }
             }
 
@@ -161,6 +167,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     private fun sendVerification() {
         mAuth.currentUser?.sendEmailVerification()
             ?.addOnCompleteListener {
+                progressDialog.dismiss()
                 if (it.isSuccessful) {
                     makeToast(
                         resources.getString(R.string.verification_sent) + " " + mAuth.currentUser?.email,
@@ -168,11 +175,21 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                     )
 
                     mAuth.signOut()
-                    changeFragment(R.id.container_host, fragment = LoginFragment())
+                    activity?.supportFragmentManager?.popBackStack()
                 } else makeToast(
                     resources.getString(R.string.verification_error) + " " + mAuth.currentUser?.email,
                     Toast.LENGTH_LONG
                 )
             }
+    }
+
+    override fun onAttach(context: Context) {
+        mContext = context
+        super.onAttach(context)
+    }
+
+    override fun onResume() {
+        (activity as MainActivity).disableWidgets()
+        super.onResume()
     }
 }

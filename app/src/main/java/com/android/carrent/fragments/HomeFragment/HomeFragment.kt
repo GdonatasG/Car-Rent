@@ -120,16 +120,17 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         divider.setDrawable(resources.getDrawable(R.drawable.car_item_divider))
         v.rv_list.addItemDecoration(divider)
 
-
         // map init, location updates
         mMap = v.mapview
         initMap(savedInstanceState)
+
         mMapServiceGpsRequests.checkLocation()
 
         // toolbar
         setHasOptionsMenu(true)
 
         return v
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -372,7 +373,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
             R.id.btn_profile -> {
                 mAuth.currentUser?.reload()
                 if (mAuth.currentUser == null) {
-                    noUserGoToLogin(view = R.id.container_host)
+                    noUserGoToLogin(view = R.id.container_host, context = mContext)
                 } else addFragmentWithBackStack(
                     view = R.id.container_host,
                     fragment = ProfileFragment(),
@@ -496,6 +497,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     override fun onResume() {
+        (activity as MainActivity).enabledWidgets()
         super.onResume()
         mMap.onResume()
         // to handle camera view when backstacking
@@ -523,6 +525,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     override fun onPause() {
+
         mMap.onPause()
         super.onPause()
     }
