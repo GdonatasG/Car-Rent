@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
                 snackbar?.dismiss()
             }
             snackbar?.duration = BaseTransientBottomBar.LENGTH_INDEFINITE
-            mainSnackbarView(snackbar = snackbar, activity = this)
+            mainSnackbarView(snackbar = snackbar, context = this)
             snackbar?.show()
         } else {
             snackbar?.dismiss()

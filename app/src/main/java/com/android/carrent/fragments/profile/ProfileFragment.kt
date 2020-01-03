@@ -39,7 +39,7 @@ class ProfileFragment : Fragment() {
         mAuthStateListener = FirebaseAuth.AuthStateListener {
             mAuth = it
             if (mAuth.currentUser == null && flag) {
-                noUserRemoveFragment(ProfileFragment())
+                noUserPopProfileFragments(context = mContext)
                 flag = false
             }
         }
@@ -75,8 +75,7 @@ class ProfileFragment : Fragment() {
                 if (u != null) {
                     setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
                     updateUserBalance(u.balance)
-                } else noUserRemoveFragment(this)
-
+                } else noUserPopProfileFragments(context = mContext)
 
             })
         }
