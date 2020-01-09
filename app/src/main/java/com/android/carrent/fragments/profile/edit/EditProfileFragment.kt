@@ -30,6 +30,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
     // Context (to ensure that not null)
     private lateinit var mContext: Context
 
+    // Toolbar title
+    private var mToolbarTitle: String? = ""
+
     // ViewModel
     private lateinit var viewModel: EditProfileViewModel
     private var user: MutableLiveData<User> = MutableLiveData()
@@ -79,9 +82,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
             viewModel.getUser(it).observe(viewLifecycleOwner, Observer<User> { u ->
                 user.value = u
                 if (u != null) {
-                    setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
+                    mToolbarTitle = u.username
+                    setToolbarTitle(mToolbarTitle + " " + resources.getString(R.string.profile))
                     loadInputs(u)
-                } else noUserPopProfileFragments(context = context)
+                } else noUserPopFragment(resources.getString(R.string.message_logged_out))
             })
         }
     }
@@ -95,10 +99,11 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.btn_confirm -> {
+                hideKeyboard()
                 if ((activity as MainActivity).isInternetOn) {
                     mAuth.currentUser?.reload()
                     if (mAuth.currentUser != null) updateCurrentUser()
-                    else noUserPopProfileFragments(context = context)
+                    else noUserPopFragment(resources.getString(R.string.message_logged_out))
                 } else (activity as MainActivity).showNetworkMessage()
             }
         }
@@ -170,7 +175,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                     }
                 }
             } else {
-                noUserPopProfileFragments(context = context)
+                noUserPopFragment(resources.getString(R.string.message_logged_out))
             }
         }
 
@@ -194,6 +199,18 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
     override fun onAttach(context: Context) {
         mContext = context
         super.onAttach(context)
+    }
+
+    override fun onPause() {
+        shouldShowHomeButton(activity, false)
+        setToolbarTitle("")
+        super.onPause()
+    }
+
+    override fun onResume() {
+        shouldShowHomeButton(activity, true)
+        setToolbarTitle(mToolbarTitle + " " + resources.getString(R.string.profile))
+        super.onResume()
     }
 
     override fun onDetach() {

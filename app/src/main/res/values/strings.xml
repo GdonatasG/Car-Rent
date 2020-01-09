@@ -114,6 +114,20 @@
 
     <string name="btn_rent">Rent</string>
 
+
+    <!--CarManagementFragment-->
+    <string name="extend">Extend</string>
+    <string name="lock">Lock</string>
+    <string name="unlock">Unlock</string>
+    <string name="is_locked">is locked now</string>
+    <string name="is_unlocked">is unlocked now</string>
+    <string name="more_details">More details</string>
+    <string name="rent_expired">Your rent has expired</string>
+
+    <string name="car_extend_period">Select extend time</string>
+    <string name="car_extend_date">Selected to extend until:</string>
+    <string name="time_extended">Time extended</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

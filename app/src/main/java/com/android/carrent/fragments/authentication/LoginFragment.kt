@@ -65,11 +65,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_login -> {
+                hideKeyboard()
                 Log.d(TAG, "Clicked on login button")
                 doValidations()
             }
 
             R.id.tv_continue_as_guest -> {
+                hideKeyboard()
                 activity?.supportFragmentManager?.popBackStack(
                     BACKSTACK_LOGIN_FRAGMENT,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -78,6 +80,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
             R.id.tv_goto_register -> {
                 Log.d(TAG, "Clicked on register textview")
+                hideKeyboard()
                 addFragmentWithBackStack(
                     view = R.id.container_host,
                     fragment = RegisterFragment(),
@@ -86,6 +89,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.tv_forgot_password -> {
+                hideKeyboard()
                 Log.d(TAG, "Clicked on forgot password textview")
             }
         }
@@ -119,6 +123,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     } else {
                         mAuth.signOut()
                         progressDialog.dismiss()
+                        hideKeyboard()
                         makeToast(resources.getString(R.string.not_verified))
                     }
 

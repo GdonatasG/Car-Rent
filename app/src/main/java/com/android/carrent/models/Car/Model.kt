@@ -11,6 +11,8 @@ class Model {
     var releaseDate: String? = null
     @PropertyName("gasType")
     var gasType: String? = null
+    @PropertyName("locked")
+    var locked: Boolean? = null
     @PropertyName("fullTankCapacity")
     var fullTankCapacity: Float? = null
     @PropertyName("tankLeft")
@@ -26,11 +28,13 @@ class Model {
 
     constructor() {}
 
+
     constructor(
         title: String?,
         photoUrl: String?,
         releaseDate: String?,
         gasType: String?,
+        locked: Boolean?,
         fullTankCapacity: Float?,
         tankLeft: Float?,
         averageFuelConsCity: Float?,
@@ -42,6 +46,7 @@ class Model {
         this.photoUrl = photoUrl
         this.releaseDate = releaseDate
         this.gasType = gasType
+        this.locked = locked
         this.fullTankCapacity = fullTankCapacity
         this.tankLeft = tankLeft
         this.averageFuelConsCity = averageFuelConsCity
@@ -49,4 +54,6 @@ class Model {
         this.averageFuelConsMixed = averageFuelConsMixed
         this.engine = engine
     }
+
+
 }

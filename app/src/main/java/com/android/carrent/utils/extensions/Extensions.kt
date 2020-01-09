@@ -6,15 +6,13 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
 import com.android.carrent.fragments.authentication.LoginFragment
 import com.android.carrent.utils.constants.Constants.BACKSTACK_LOGIN_FRAGMENT
-import com.android.carrent.utils.constants.Constants.BACKSTACK_PROFILE_FRAGMENT
-import com.android.carrent.utils.constants.Constants.BACKSTACK_REGISTER_FRAGMENT
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -30,13 +28,6 @@ fun Activity.makeToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 fun modifyProgressDialog(pd: ProgressDialog?) {
     pd?.setCancelable(false)
     pd?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-}
-
-fun Fragment.removeFragment(fragment: Fragment) {
-    activity?.supportFragmentManager
-        ?.beginTransaction()
-        ?.remove(fragment)
-        ?.commit()
 }
 
 fun Fragment.changeFragmentWithBackstack(view: Int, fragment: Fragment, tag: String) {
@@ -59,18 +50,17 @@ fun Fragment.addFragmentWithBackStack(
         ?.commit()
 }
 
-fun Fragment.noUserPopProfileFragments(
-    context: Context?
-) {
-    val snackbar = loggedOutSnackbar(context = context)
+fun Fragment.noUserPopFragment(message: String) {
     FirebaseAuth.getInstance().signOut()
-    activity?.supportFragmentManager?.popBackStack(
-        BACKSTACK_PROFILE_FRAGMENT,
-        FragmentManager.POP_BACK_STACK_INCLUSIVE
-    )
-    snackbar.show()
+    activity?.supportFragmentManager?.popBackStack()
+    (activity as MainActivity).mSnackbar?.setText(message)
+    (activity as MainActivity).mSnackbar?.show()
+}
 
-
+fun Fragment.noCarPopFragment(message: String) {
+    activity?.supportFragmentManager?.popBackStack()
+    (activity as MainActivity).mSnackbar?.setText(message)
+    (activity as MainActivity).mSnackbar?.show()
 }
 
 fun Fragment.noUserGoToLogin(view: Int, context: Context?) {
@@ -88,19 +78,6 @@ fun Fragment.loginSnackbar(view: Int, context: Context?): Snackbar {
         addFragmentWithBackStack(view, LoginFragment(), BACKSTACK_LOGIN_FRAGMENT)
     }
     snackbar.duration = BaseTransientBottomBar.LENGTH_LONG
-    mainSnackbarView(snackbar = snackbar, context = context)
-
-    return snackbar
-}
-
-fun Fragment.loggedOutSnackbar(context: Context?): Snackbar {
-    val snackbar = Snackbar.make(
-        activity?.findViewById(R.id.connectivitySnack)!!,
-        resources.getString(R.string.message_logged_out),
-        Snackbar.LENGTH_LONG
-    ).setAction(resources.getString(R.string.snackbar_action_close)) {}
-
-    snackbar.duration = BaseTransientBottomBar.LENGTH_INDEFINITE
     mainSnackbarView(snackbar = snackbar, context = context)
 
     return snackbar
@@ -130,4 +107,15 @@ fun shouldShowHomeButton(activity: Activity?, shouldShow: Boolean) {
 
 fun Fragment.setToolbarTitle(title: String?) {
     (activity as MainActivity).setToolbarTitle(title)
+}
+
+fun Fragment.hideKeyboard() {
+    val imm =
+        context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view?.windowToken, 0)
+}
+
+fun Fragment.detailCarColorBold(text: String?): String {
+
+    return "<b><font color=" + resources.getColor(R.color.car_rented) + ">" + text + "</font></b>"
 }

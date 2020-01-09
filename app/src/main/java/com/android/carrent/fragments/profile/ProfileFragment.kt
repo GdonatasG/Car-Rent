@@ -23,11 +23,14 @@ class ProfileFragment : Fragment() {
     // Context (to ensure that not null)
     private lateinit var mContext: Context
 
+
+    // Toolbar title
+    private var mToolbarTitle: String? = ""
+
     //Firebase
     private lateinit var mAuth: FirebaseAuth
     private var mAuthStateListener: FirebaseAuth.AuthStateListener? = null
     private var flag = true
-
     private var user: MutableLiveData<User> = MutableLiveData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +42,7 @@ class ProfileFragment : Fragment() {
         mAuthStateListener = FirebaseAuth.AuthStateListener {
             mAuth = it
             if (mAuth.currentUser == null && flag) {
-                noUserPopProfileFragments(context = mContext)
+                noUserPopFragment(resources.getString(R.string.message_logged_out))
                 flag = false
             }
         }
@@ -73,9 +76,11 @@ class ProfileFragment : Fragment() {
             viewModel.getUser(it).observe(viewLifecycleOwner, Observer<User> { u ->
                 user.value = u
                 if (u != null) {
-                    setToolbarTitle(u.username + " " + resources.getString(R.string.profile))
+                    mToolbarTitle = u.username
+                    setToolbarTitle(mToolbarTitle + " " + resources.getString(R.string.profile))
+
                     updateUserBalance(u.balance)
-                } else noUserPopProfileFragments(context = mContext)
+                } else noUserPopFragment(resources.getString(R.string.message_logged_out))
 
             })
         }
@@ -103,7 +108,14 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         shouldShowHomeButton(activity, true)
+        setToolbarTitle(mToolbarTitle + " " + resources.getString(R.string.profile))
         super.onResume()
+    }
+
+    override fun onPause() {
+        shouldShowHomeButton(activity, false)
+        setToolbarTitle("")
+        super.onPause()
     }
 
     override fun onStart() {

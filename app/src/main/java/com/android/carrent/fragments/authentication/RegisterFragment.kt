@@ -71,10 +71,12 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         when (view?.id) {
             R.id.btn_register -> {
+                hideKeyboard()
                 doValidations()
             }
 
             R.id.tv_continue_as_guest -> {
+                hideKeyboard()
                 activity?.supportFragmentManager?.popBackStack(
                     BACKSTACK_LOGIN_FRAGMENT,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -82,6 +84,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.tv_goto_login -> {
+                hideKeyboard()
                 activity?.supportFragmentManager?.popBackStack()
             }
         }
@@ -149,7 +152,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                                     sendVerification()
                                 } else {
                                     progressDialog.dismiss()
-                                    activity?.supportFragmentManager?.popBackStack()
+                                    activity?.supportFragmentManager?.popBackStack(
+                                        BACKSTACK_LOGIN_FRAGMENT,
+                                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                                    )
                                 }
                             } else {
                                 progressDialog.dismiss()

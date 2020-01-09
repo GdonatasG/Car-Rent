@@ -1,6 +1,7 @@
 package com.android.carrent.fragments.profile
 
 import android.os.Bundle
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
@@ -8,9 +9,11 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.android.carrent.R
 import com.android.carrent.activities.MainActivity
+import com.android.carrent.fragments.CarManagement.CarManagementFragment
 import com.android.carrent.fragments.profile.edit.EditProfileFragment
 import com.android.carrent.models.Car.Car
 import com.android.carrent.models.User.User
+import com.android.carrent.utils.constants.Constants.BACKSTACK_CAR_MANAGEMENT_FRAGMENT
 import com.android.carrent.utils.constants.Constants.BACKSTACK_EDIT_PROFILE_FRAGMENT
 import com.android.carrent.utils.constants.Constants.DATE_FORMAT
 import com.android.carrent.utils.extensions.*
@@ -24,6 +27,7 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(),
     //Firebase
     private lateinit var mAuth: FirebaseAuth
     private var mAuthStateListener: FirebaseAuth.AuthStateListener? = null
+    private var user: MutableLiveData<User> = MutableLiveData()
 
     // ViewModel
     private lateinit var viewModel: ProfileViewModel
@@ -48,9 +52,17 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(),
         when (preference?.key) {
             resources.getString(R.string.KEY_MY_CAR) -> {
                 mAuth.currentUser?.reload()
-                if (mAuth.currentUser != null) {
-                    // *Ensure that user hasCar
-                    // **Add CarManagement fragment, bundle: CAR_ID
+                if (mAuth.currentUser != null && user.value != null) {
+                    if (user.value?.rent?.hasCar!! && user.value?.rent?.rentedCarId != 0) {
+                        changeFragmentWithBackstack(
+                            R.id.container_host,
+                            CarManagementFragment(),
+                            BACKSTACK_CAR_MANAGEMENT_FRAGMENT
+                        )
+                    } else {
+                        (activity as MainActivity).mSnackbar?.setText(resources.getString(R.string.rent_expired))
+                        (activity as MainActivity).mSnackbar?.show()
+                    }
                 } else {
                     mAuth.signOut()
                 }
@@ -92,6 +104,7 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(),
     private fun loadUser(uid: String?) {
         uid?.let {
             viewModel.getUser(uid).observe(this, Observer<User> { u ->
+                user.value = u
                 if (u != null) updatePreferences(u)
             })
         }
@@ -103,12 +116,17 @@ class ProfilePreferenceFragment : PreferenceFragmentCompat(),
 
     private fun updateUserCarPreference(user: User) {
         val pref = findPreference<Preference>(resources.getString(R.string.KEY_MY_CAR))
-        if (user.rent?.hasCar!!) {
-            viewModel.getCarById(user.rent?.rentedCarId!!).observe(this, Observer<Car> {
-                pref?.title = it.model.title
-                pref?.summary =
-                    resources.getString(R.string.rented_until) + " " + DATE_FORMAT.format(it.rent.rentedUntil?.toDate())
-            })
+        if (user.rent?.hasCar!! && user.rent?.rentedCarId != 0) {
+            viewModel.getCarById(user.rent?.rentedCarId!!)
+                .observe(viewLifecycleOwner, Observer<Car> { c ->
+                    if (c != null) {
+                        pref?.title = c.model.title
+                        pref?.summary =
+                            resources.getString(R.string.rented_until) + " " + DATE_FORMAT.format(
+                                c.rent.rentedUntil?.toDate()
+                            )
+                    }
+                })
         } else {
             pref?.title = resources.getString(R.string.my_car_title)
             pref?.summary = resources.getString(R.string.my_car_summary)

@@ -35,13 +35,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.android.carrent.fragments.CarManagement.CarManagementFragment
 import com.android.carrent.models.User.User
-import com.android.carrent.utils.constants.Constants.DATE_FORMAT
+import com.android.carrent.utils.constants.Constants.BACKSTACK_CAR_MANAGEMENT_FRAGMENT
+import com.android.carrent.utils.constants.Constants.MINIMUM_RENT_TIME
 import com.android.carrent.utils.extensions.*
 import com.google.firebase.Timestamp
 import kotlinx.android.synthetic.main.car_rent_layout.view.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
@@ -61,6 +62,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
 
     // Widgets
     private lateinit var mMap: MapView
+    private var mToolbarTitle: String? = ""
 
     // ViewModel
     private lateinit var viewModel: CarFragmentViewModel
@@ -74,11 +76,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
 
     private var isDateSelected = false
     private var isTimeSelected = false
-    private var HOUR_TO_MILLIS = 3600000 // 1 hour in milliseconds
     private var totalRentSum: Float = 0F
-    // Minimum time of rent in milliseconds
-    private var MINIMUM_RENT_TIME =
-        1 * HOUR_TO_MILLIS - TimeUnit.SECONDS.toMillis(40) // Some time given to user to make a decision
 
     // Car Rent Dialog
     private lateinit var dialog: AlertDialog
@@ -89,7 +87,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     private lateinit var progressDialog: ProgressDialog
 
 
-    val selectedDate = Calendar.getInstance()
+    private val selectedDate = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +126,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         progressDialog = ProgressDialog(mContext, R.style.progress_dialog_bar)
         modifyProgressDialog(progressDialog)
 
+        dpd = DatePickerDialog(mContext)
+
         // On-clicks
         mView?.car_main_details?.arrowBtnCarMain?.setOnClickListener(this)
         mView?.car_fuel_consumption?.arrowBtnCarFuelConsumption?.setOnClickListener(this)
@@ -157,13 +157,12 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         viewModel.getCarById(id).observe(viewLifecycleOwner, Observer<Car> {
             car.value = it
             if (car.value == null) {
-                makeToast(resources.getString(R.string.ERROR_NO_CAR))
-                // Removing dialog
+                // Removing dialogs
                 clearFragmentContentWhenRemoving()
-                activity?.supportFragmentManager?.popBackStack()
-                //removeFragment(this)
+                noCarPopFragment(resources.getString(R.string.ERROR_NO_CAR))
             } else {
-                setToolbarTitle(it.model.title)
+                mToolbarTitle = it.model.title
+                setToolbarTitle(mToolbarTitle)
                 loadCarImage(it.model.photoUrl)
                 setUpCarMainDetails(it)
                 setUpCarConsumption(it)
@@ -306,11 +305,6 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         }
     }
 
-    private fun detailCarColorBold(text: String?): String {
-
-        return "<b><font color=" + resources.getColor(com.android.carrent.R.color.car_rented) + ">" + text + "</font></b>"
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             // Main expandable Card View of car details
@@ -340,12 +334,12 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                 )
             }
 
-            com.android.carrent.R.id.btn_rent -> {
+            R.id.btn_rent -> {
                 mAuth.currentUser?.reload()
                 if (mAuth.currentUser == null) {
                     noUserGoToLogin(view = R.id.container_host, context = mContext)
                 } else {
-                    if (isRentedOrHaveRented()) makeToast(
+                    if (isRentedOrHaveRented(car, user)) makeToast(
                         resources.getString(
                             R.string.CAR_RENT_ERROR_RENTED_OR_HAS_CAR
                         )
@@ -369,7 +363,14 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         builder.setTitle(getText(R.string.car_rent_period))
         builder.setView(v)
 
-        setFinalRentDateAndCost(v.tv_selected_date, v.tv_total_cost, totalRentSum())
+        setFinalRentDateAndCost(
+            v.tv_selected_date,
+            v.tv_total_cost,
+            totalRentSum(selectedDate, car),
+            isDateSelected,
+            isTimeSelected,
+            selectedDate
+        )
 
         builder.setPositiveButton("Confirm") { _, _ -> }
 
@@ -397,8 +398,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                     progressDialog.show()
                     if (mAuth.currentUser != null && user.value != null) {
                         if (areRequirementsMet()) {
-                            if (!isRentedOrHaveRented()) {
-                                totalRentSum = totalRentSum()
+                            if (!isRentedOrHaveRented(car, user)) {
+                                totalRentSum = totalRentSum(selectedDate, car)
                                 if (user.value?.balance!! >= totalRentSum) {
                                     val rentStarted = Timestamp(Calendar.getInstance().time)
                                     val rentedUntil = Timestamp(selectedDate.time)
@@ -428,8 +429,15 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                                                             .set(car.value!!)
 
                                                         progressDialog.dismiss()
-                                                        // Start CarManagementFragment (SOON)
-                                                        makeToast("CAR RENTED / TOAST WILL BE DELETED.")
+                                                        tpd.dismiss()
+                                                        dpd.dismiss()
+                                                        dialog.dismiss()
+                                                        changeFragmentWithBackstack(
+                                                            R.id.container_host,
+                                                            CarManagementFragment(),
+                                                            BACKSTACK_CAR_MANAGEMENT_FRAGMENT
+                                                        )
+
 
                                                     } else {
                                                         progressDialog.dismiss()
@@ -481,11 +489,14 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                             selectedDate.set(Calendar.HOUR_OF_DAY, j)
                             selectedDate.set(Calendar.MINUTE, j2)
                             isTimeSelected = true
-                            totalRentSum = totalRentSum()
+                            totalRentSum = totalRentSum(selectedDate, car)
                             setFinalRentDateAndCost(
                                 v.tv_selected_date,
                                 v.tv_total_cost,
-                                totalRentSum
+                                totalRentSum,
+                                isDateSelected,
+                                isTimeSelected,
+                                selectedDate
                             )
                         },
                         selectedDate.get(Calendar.HOUR_OF_DAY),
@@ -498,6 +509,7 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
                 selectedDate.get(Calendar.MONTH),
                 selectedDate.get(Calendar.DAY_OF_MONTH)
             )
+            dpd.datePicker.minDate = Calendar.getInstance().timeInMillis - 1000
             dpd.show()
         }
 
@@ -506,90 +518,9 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
         }
     }
 
-    private fun isRentedOrHaveRented(): Boolean {
-        return if (car.value != null && user.value != null) car.value?.rent?.rented!! || user.value?.rent?.hasCar!!
-        else false
-    }
-
-    private fun totalRentSum(): Float {
-        var total: Float // Total sum
-        val RENT_TIME_MINUTES =
-            TimeUnit.MILLISECONDS.toMinutes(selectedDate.timeInMillis - Calendar.getInstance().timeInMillis)
-
-        // Check weekend discount
-        if (isWeekend()) {
-            val sum = calculateSum(car.value?.rate?.weekendRatePerH!!, RENT_TIME_MINUTES)
-            if (car.value?.rate?.hasDiscountWeekend!!) total =
-                sum - (sum * (calculateDiscountPercentage(car.value?.rate?.discountPercentage!!)))
-            else total = sum
-        }
-        // Check workdays discount
-        else {
-            val sum = calculateSum(car.value?.rate?.workdaysRatePerH!!, RENT_TIME_MINUTES)
-            if (car.value?.rate?.hasDiscountWorkdays!!) total =
-                sum - (sum * (calculateDiscountPercentage(car.value?.rate?.discountPercentage!!)))
-            else total = sum
-        }
-
-        return total
-    }
-
-    private fun calculateDiscountPercentage(per: Float): Float {
-        var calculatedPercentage: Float
-        if (per >= 1) {
-            calculatedPercentage = per / 100
-        } else if (per < 1 && per >= 0.01) {
-            calculatedPercentage = per / 10
-        } else {
-            calculatedPercentage = per
-        }
-        return calculatedPercentage
-    }
-
-    private fun calculateSum(ratePerH: Float, minutes: Long): Float {
-        var sum = 0F
-        var mins = minutes
-        while (mins >= 60) {
-            sum += ratePerH
-            mins -= 60
-        }
-
-        if (mins > 0) {
-            sum += mins * ratePerH / 60
-        }
-
-        return sum
-    }
-
-    private fun isWeekend(): Boolean {
-        return Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || Calendar.getInstance().get(
-            Calendar.DAY_OF_WEEK
-        ) == Calendar.SUNDAY
-    }
-
     private fun areRequirementsMet(): Boolean {
         // Selected time should meet requirements (time from now + rent time must be less or equal to selected  date and time)
         return selectedDate.timeInMillis >= (Calendar.getInstance().timeInMillis + MINIMUM_RENT_TIME)
-    }
-
-    private fun setFinalRentDateAndCost(tvDate: TextView, tvCost: TextView, totalSum: Float) {
-        if (isDateSelected and isTimeSelected) {
-            tvDate.text =
-                Html.fromHtml(
-                    detailCarColorBold(
-                        DATE_FORMAT.format(
-                            selectedDate.time
-                        )
-                    )
-                )
-
-            tvCost.text =
-                Html.fromHtml(
-                    detailCarColorBold(
-                        String.format("%.2f", totalSum)
-                    ) + " " + resources.getString(R.string.nav_header_currency_euro)
-                )
-        }
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
@@ -625,6 +556,8 @@ class CarFragment : Fragment(), View.OnClickListener, OnMapReadyCallback {
     override fun onResume() {
         (activity as MainActivity).enabledWidgets()
         shouldShowHomeButton(activity, true)
+        setToolbarTitle(mToolbarTitle)
+
         mMap.onResume()
         super.onResume()
     }
