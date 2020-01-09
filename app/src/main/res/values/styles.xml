@@ -159,19 +159,6 @@
 
     <!-- CardView item-->
 
-    <style name="cardview">
-        <item name="android:clickable">true</item>
-        <item name="android:layout_width">@dimen/cardview_width</item>
-        <item name="android:layout_height">@dimen/cardview_height</item>
-        <item name="android:layout_margin">10dp</item>
-    </style>
-
-    <style name="cardview_image">
-        <item name="android:layout_width">@dimen/cardview_image_width</item>
-        <item name="android:layout_height">@dimen/cardview_image_height</item>
-        <item name="android:padding">10dp</item>
-    </style>
-
     <style name="cardview_title">
         <item name="android:gravity">center</item>
         <item name="android:textStyle">bold</item>
@@ -216,6 +203,32 @@
         <item name="android:ellipsize">end</item>
         <item name="android:maxLength">30</item>
         <item name="android:maxLines">1</item>
+    </style>
+
+
+    <!-- Car management fragment-->
+
+    <style name="managementCardView">
+        <item name="android:layout_margin">20dp</item>
+    </style>
+
+    <style name="managementCardViewLayout">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="managementCardViewImage">
+        <item name="android:backgroundTint">@android:color/white</item>
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+    </style>
+
+    <style name="managementCardViewButton" parent="button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+        <item name="android:padding">5dp</item>
     </style>
 
 

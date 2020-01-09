@@ -53,7 +53,7 @@ import kotlinx.android.synthetic.main.fragment_home.view.*
 class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
 
-    private var TAG: String = "MainActivity"
+    private var TAG: String = "HomeFragment"
     private lateinit var mContext: Context
     // Is first attempt of location request
     private var isFirstAttempt = true
@@ -120,11 +120,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
         divider.setDrawable(resources.getDrawable(R.drawable.car_item_divider))
         v.rv_list.addItemDecoration(divider)
 
+        mMapServiceGpsRequests.checkLocation()
+
         // map init, location updates
         mMap = v.mapview
         initMap(savedInstanceState)
-
-        mMapServiceGpsRequests.checkLocation()
 
         // toolbar
         setHasOptionsMenu(true)
@@ -525,7 +525,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionC
     }
 
     override fun onPause() {
-
         mMap.onPause()
         super.onPause()
     }

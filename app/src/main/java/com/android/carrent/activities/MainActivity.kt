@@ -23,9 +23,11 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
 
     private var TAG: String = "MainActivity"
 
+    private var snackbar: Snackbar? = null
+    var mSnackbar: Snackbar? = null
+
     // Internet connection receiver
     var isInternetOn: Boolean = false
-    private var snackbar: Snackbar? = null
     private var connectivityReceiver: ConnectivityReceiver = ConnectivityReceiver()
 
     // MapServiceGpsRequests
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
         setContentView(com.android.carrent.R.layout.activity_main)
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
+        initSnackbar()
 
         // Init internet connection receiver
         registerReceiver(
@@ -56,6 +60,18 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
             setFragment(fragment = LoginFragment())
         }
 
+    }
+
+    private fun initSnackbar() {
+        mSnackbar = Snackbar.make(
+            connectivitySnack,
+            getText(R.string.ERROR_NO_CAR),
+            Snackbar.LENGTH_LONG
+        ).setAction(resources.getText(R.string.snackbar_action_close)) {
+            mSnackbar?.dismiss()
+        }
+        mSnackbar?.duration = BaseTransientBottomBar.LENGTH_INDEFINITE
+        mainSnackbarView(snackbar = mSnackbar, context = this)
     }
 
     override fun onNetworkConnectionChanged(isConnected: Boolean) {
@@ -93,18 +109,24 @@ class MainActivity : AppCompatActivity(), ConnectivityReceiver.ConnectivityRecei
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        super.onBackPressed()
+        popBackStack()
         return true
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+        popBackStack()
+    }
+
+    private fun popBackStack() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else super.onBackPressed()
     }
 
     private fun setFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
-            .replace(com.android.carrent.R.id.container_host, fragment)
+            .replace(R.id.container_host, fragment)
             .commit()
     }
 

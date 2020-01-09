@@ -16,7 +16,7 @@ import java.io.IOException
 import java.util.*
 
 fun setCameraView(googleMap: GoogleMap, location: Location?) {
-    googleMap.moveCamera(
+    googleMap.animateCamera(
         CameraUpdateFactory.newLatLngZoom(
             LatLng(location!!.latitude, location.longitude),
             Constants.DEFAULT_ZOOM
@@ -25,7 +25,7 @@ fun setCameraView(googleMap: GoogleMap, location: Location?) {
 }
 
 fun setCameraViewWBounds(googleMap: GoogleMap, bounds: LatLngBounds) {
-    googleMap.moveCamera(
+    googleMap.animateCamera(
         CameraUpdateFactory.newLatLngZoom(
             bounds.center,
             Constants.COUNTRY_ZOOM
