@@ -208,7 +208,7 @@ class CarManagementFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Co
                 setUpRentInfo(it.rent.rentedUntil)
                 setUpLock(it.model.locked, it.model.title)
                 setUpLocation(it)
-                selectedDate.time = it.rent.rentedUntil?.toDate()
+                setCalendarDateToRentedUntil(it.rent.rentedUntil)
             }
         })
     }
@@ -259,6 +259,10 @@ class CarManagementFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Co
             car.location!!.longitude,
             mContext
         ).locality
+    }
+
+    private fun setCalendarDateToRentedUntil(rentedUntil: Timestamp?) {
+        if (!isDateSelected && !isTimeSelected) selectedDate.time = rentedUntil?.toDate()
     }
 
     override fun onClick(p0: View?) {
@@ -355,6 +359,8 @@ class CarManagementFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.Co
                                     car.value?.rent?.rentedUntil = rentedUntil
                                     viewModel.getCarRef(car.value?.id!!).set(car.value!!)
 
+                                    isDateSelected = false
+                                    isTimeSelected = false
                                     progressDialog.dismiss()
                                     dialog.dismiss()
                                     (activity as MainActivity).mSnackbar?.setText(
